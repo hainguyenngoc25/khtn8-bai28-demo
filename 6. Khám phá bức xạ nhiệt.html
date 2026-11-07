@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#195658">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<title>Khoa học tự nhiên 8 – Khám phá bức xạ nhiệt</title>
+<style>
+:root{--teal:#195658;--teal2:#28756b;--lime:#c7e36e;--ink:#173c3b;--muted:#68817a;--paper:#f4f8f3;--line:#dbe8df;--white:#fff;--deep:#0f3a3a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;min-height:0;overflow:hidden;font-family:Roboto,"Segoe UI",Arial,sans-serif;color:var(--ink);background:#e9f0eb}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #e7ac4f;outline-offset:2px}
+[hidden]{display:none!important}
+
+/* ===== HEADER ===== */
+header{height:52px;flex:0 0 52px;background:#fff;display:flex;align-items:center;gap:14px;padding:8px 16px;border:1px solid #dce5df;position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;white-space:nowrap}
+.brand-logo{height:30px;width:auto;display:block}
+.headtext{border-left:1px solid #d7e3db;padding-left:14px;line-height:1.25;min-width:0}
+.headtext b{display:block;font-size:12px;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.headtext strong{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.headtools{margin-left:auto;display:flex;gap:8px}
+.headtools button{border:1px solid var(--line);border-radius:11px;background:white;color:var(--teal);padding:8px 11px;font-size:12px;font-weight:800;white-space:nowrap}
+
+/* ===== BỐ CỤC ===== */
+main{width:100%;height:calc(100dvh - 52px);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+.lesson-layout{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;user-select:none}
+.viewer{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;background:#fff;overflow:hidden;position:relative}
+.view-content{flex:1 1 auto;min-height:0;position:relative}
+.visual{position:absolute;inset:0;overflow:hidden;background:var(--deep)}
+@keyframes floatIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.view{position:absolute;inset:0;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;background:radial-gradient(ellipse at 50% 30%,#3f8a7e 0%,#245f60 55%,#17474a 100%)}
+#sceneA,#sceneB,#sceneC,#sceneD{position:absolute;inset:0}
+#sceneA[hidden],#sceneB[hidden],#sceneC[hidden],#sceneD[hidden]{display:none}
+
+/* ===== THANH CÁC BƯỚC ===== */
+.rail{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:4px 10px;background:linear-gradient(180deg,#ffffff,#f3f8f4);border-top:1px solid #d5e4da}
+.rail .steps{flex:1 1 auto;min-width:0}
+.steps{position:relative;overflow:hidden;padding:2px 0 3px;touch-action:pan-y;cursor:grab}
+.steps.dragging{cursor:grabbing}
+.steps.dragging .step{pointer-events:none}
+.steps-track{display:flex;gap:6px;width:max-content;margin:0;align-items:center;transition:transform .35s ease;will-change:transform}
+.step{flex:0 0 auto;max-width:300px;min-height:30px;padding:4px 14px 4px 5px;border-radius:999px;border:1px solid #cfe0d4;background:#fff;color:#111;font-size:11px;line-height:1.2;display:flex;align-items:center;gap:7px;text-align:left;box-shadow:0 1px 4px #173c3b14;transition:background .2s,border-color .2s,box-shadow .2s}
+.step .num{flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:#e6f0e8;color:#111;font-size:10px;font-weight:700;display:grid;place-items:center}
+.step:hover{border-color:#8dbf9d;box-shadow:0 2px 8px #173c3b22}
+.step.done{background:#f1f9f2;border-color:#8dc79e}
+.step.done .num{background:#2e9e5b;color:#fff}
+.step.active{background:#d9ee9b;border-color:#8cb43a;box-shadow:0 2px 10px #8cb43a66;font-weight:600}
+.step.active .num{background:#195658;color:#fff}
+.steps .step.lock{opacity:.5}
+.side-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:46px;height:46px;border-radius:50%;border:1px solid #ffffffaa;background:#ffffffe0;color:var(--teal);font-size:30px;line-height:1;padding:0 0 3px;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 16px #0006;transition:transform .15s,opacity .2s}
+.side-nav.prev{left:10px}.side-nav.next{right:10px}
+.side-nav:hover:not(:disabled){transform:translateY(-50%) scale(1.08)}
+.side-nav:disabled{opacity:0;pointer-events:none}
+body.rep .side-nav{display:none}
+.rail{display:none!important}
+@media(max-width:640px){.side-nav{width:36px;height:36px;font-size:24px;opacity:.9}.side-nav.prev{left:4px}.side-nav.next{right:4px}}
+
+/* ===== MÀN HÌNH MỞ ĐẦU ===== */
+.intro-screen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0b4a4f;color:#fff;text-align:center;padding:28px;transition:opacity .45s ease,visibility .45s ease}
+.intro-screen.leaving{opacity:0;visibility:hidden;pointer-events:none}
+.intro-bg{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 50% 20%,#3f9a7e 0%,#1c6a62 45%,#0b4a4f 100%)}
+@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.08) translate(-1.5%,1%)}}
+.gcells{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;opacity:.45}
+.gcells i{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d9f7a8cc 0,#7bc46acc 38%,#2f8f3a99 72%,#1b5a2455 100%);box-shadow:inset 0 0 14px #ffffff55;animation:gdrift ease-in-out infinite alternate}
+@keyframes gdrift{to{transform:translate(var(--dx),var(--dy))}}
+.intro-tint{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(20,82,80,.78),rgba(25,96,90,.62) 50%,rgba(10,52,58,.86))}
+.intro-inner{position:relative;z-index:4;width:min(100%,1200px);display:flex;flex-direction:column;align-items:center}
+.intro-brand{display:flex;align-items:center;margin-bottom:14px}
+.intro-brand .brand-logo{height:34px;width:auto;filter:brightness(0) invert(1)}
+.intro-kicker{font-size:12px;letter-spacing:.18em;font-weight:900;color:#d4ef73;margin-bottom:12px}
+.intro-inner h1{font-size:clamp(28px,4.2vw,56px);line-height:1.1;letter-spacing:-.03em;margin:0 0 14px;font-weight:900;max-width:1000px;text-shadow:0 4px 24px #0007}
+.intro-inner h1 em{font-style:normal;color:#c7e85e}
+.intro-inner p{max-width:720px;font-size:clamp(13px,1.3vw,17px);line-height:1.65;color:#e1efeb;margin:0;text-shadow:0 2px 10px #0008}
+.intro-rule{width:min(470px,72vw);height:4px;border-radius:9px;background:#c7e85e;margin:18px 0 15px}
+.intro-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 18px}
+.intro-tags span{background:#ffffff1f;border:1px solid #ffffff4d;border-radius:999px;padding:6px 13px;font-size:13px;font-weight:700;backdrop-filter:blur(4px)}
+.intro-start{border:1px solid #ffffff70;background:#ffffff14;color:#fff;border-radius:13px;padding:13px 25px;font-weight:900;font-size:15px;min-width:205px;transition:.2s;backdrop-filter:blur(4px)}
+.intro-start:hover{background:#c7e85e;color:#174d4b;border-color:#c7e85e}
+.intro-start span{padding-left:10px;color:#c7e85e}
+.intro-start:hover span{color:#174d4b}
+.intro-inner>small{font-size:12px;color:#c1dcd4;margin-top:15px}
+
+/* ===== THẺ BƯỚC + BẢNG CÁC BƯỚC (góc phải) ===== */
+.stageTabs{position:absolute;right:14px;top:14px;z-index:14;display:grid;gap:8px;width:226px}
+.stab{display:flex;align-items:center;gap:10px;border:2px solid transparent;background:#fff;color:#16423c;border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;text-align:left;cursor:pointer;box-shadow:0 4px 12px #0003;transition:.15s}
+.stab i{font-style:normal;flex:0 0 22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e6efec;font-size:12px}
+.stab:hover{transform:translateX(-2px)}
+.stab.on{background:#d6f45a;border-color:#b5d63a}.stab.on i{background:#f0fbb0}
+.stab.done i{background:#2e9d5b;color:#fff}
+.stab.lock{opacity:.55;cursor:not-allowed}.stab.lock i{background:#e1e6e4;font-size:11px}
+.card{position:absolute;right:14px;top:226px;z-index:12;width:226px;background:#ffffffef;backdrop-filter:blur(8px);border-radius:14px;padding:10px 12px 11px;box-shadow:0 14px 40px #0005;border:1px solid #ffffffaa;animation:floatIn .4s ease;max-height:calc(100% - 240px);overflow:auto}
+.card .k{display:none;align-items:center;gap:8px;font-size:11.5px;letter-spacing:.12em;font-weight:900;color:var(--teal2)}
+.card .badge{margin-left:auto;letter-spacing:0;font-size:12.5px;font-weight:800;background:#e6f3e0;color:#2c6a1f;border-radius:999px;padding:4px 12px;white-space:nowrap}
+.card h2{margin:0;font-size:14.5px;line-height:1.25;color:var(--teal)}
+.card p{margin:0;display:none}
+.csteps{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+.csteps:empty{display:none}
+.csteps span{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:9px;font-size:12.5px;font-weight:700;color:#7d918c;text-align:left;line-height:1.2}
+.csteps span b{flex:0 0 24px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#e4eeec;color:#7d918c;font-size:12.5px}
+.csteps span.on{color:var(--teal)}
+.csteps span.on b{background:#ffd23f;color:#2b1d00;box-shadow:0 0 0 4px #ffd23f55}
+.csteps span.done b{background:#2e9d5b;color:#fff}
+.csteps span.done{color:#2e7d4b}
+.csteps .vs{cursor:pointer;border-radius:8px;transition:background .15s}
+.csteps .vs:hover{background:#eef6f3}
+.cguide{display:none}
+@media(min-width:761px){
+  .view.s2 ~ .s1-bottom,.view.s3 ~ .s1-bottom{display:none}
+  .cguide:not(:empty){display:grid;gap:9px;margin-top:11px;padding-top:11px;border-top:1.5px solid #dfeae6}
+  .cguide .gi{display:flex;gap:9px;align-items:flex-start}
+  .cguide .say{flex:0 0 30px;width:30px;height:30px;border-radius:50%;border:0;background:#1f5d5a;color:#fff;display:grid;place-items:center;cursor:pointer}
+  .cguide .txt{font-size:13.5px;line-height:1.45;color:#16423c;font-weight:600}
+  .cguide .gp .pill1{width:100%;justify-content:center;padding:8px 12px;font-size:13px;box-shadow:none;border:1.5px solid #c7e36e}
+}
+
+/* ===== THANH THÔNG TIN Ở CHÂN + NÚT ===== */
+.s1-bottom{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 250px 16px 70px;background:linear-gradient(180deg,transparent,#021f2599);pointer-events:none}
+.s1-bottom>*{pointer-events:auto}
+.s1-info{display:flex;align-items:center;gap:12px;text-align:left;max-width:min(94%,820px);background:#fffffff7;color:#16423c;border:2px solid #c7e36e;border-radius:16px;padding:9px 16px;font-size:clamp(14px,1.1vw,16px);font-weight:500;line-height:1.5;box-shadow:0 8px 24px #0008;animation:floatIn .3s ease}
+.s1-info b{color:var(--teal);font-weight:900}
+.s1-info .txt{flex:1 1 auto}
+.s1-info small{font-size:.88em;color:#4a6660}
+.s1-info .say,.cguide .say{flex:0 0 auto;width:40px;height:40px;border-radius:50%;border:0;background:var(--teal);color:#fff;display:grid;place-items:center;box-shadow:0 3px 8px #0004;cursor:pointer}
+.s1-info .say:hover{background:var(--teal2)}
+.s1-info.ok{border-color:#2e9d5b;background:#f1fbf4}
+.s1-info.no{border-color:#e0a21b;background:#fff8ea}
+.s1-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;align-items:center}
+.s1-pills:empty{display:none}
+.pill1{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#16423c;border:2px solid #c7e36e;border-radius:999px;padding:9px 18px;font-size:clamp(14px,1.1vw,16px);font-weight:800;box-shadow:0 5px 16px #0007;transition:transform .15s,background .2s;cursor:pointer}
+.pill1 i{font-style:normal;font-weight:900;font-size:1.15em}
+.pill1:hover{transform:translateY(-2px)}
+.pill1.warm{background:#ffe9c7;border-color:#e0a21b;color:#5a3a00}
+.pill1.on{background:#ffd23f;border-color:#fff;color:#2b1d00}
+.pill1.go{background:#ffb627;border-color:#fff;color:#2b1d00;font-size:clamp(15px,1.2vw,17px);padding:10px 22px;animation:goPulse 1.6s ease-in-out infinite}
+@keyframes goPulse{50%{box-shadow:0 0 0 8px #ffb62744,0 5px 16px #0005}}
+.pill1[disabled]{opacity:.5;cursor:default;transform:none}
+.toast{position:absolute;left:50%;top:70px;transform:translate(-50%,-10px);z-index:50;background:#0f3f3de8;color:#fff;font-size:16px;font-weight:600;padding:10px 20px;border-radius:99px;opacity:0;pointer-events:none;transition:all .3s;max-width:86%;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ===== BƯỚC 1: CHỌN DỤNG CỤ ===== */
+#sceneA{display:grid;place-items:center;padding:20px 250px 130px 14px}
+.tools{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;width:100%;max-width:1080px}
+.tools .tool{flex:0 0 calc((100% - 48px)/5);min-width:0}
+.tool{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;background:#ffffffee;border:2px solid #d6e7da;border-radius:16px;padding:10px 8px;box-shadow:0 5px 14px #0003;cursor:pointer;color:#16423c;transition:transform .15s,border-color .2s,background .2s}
+.tool:hover{transform:translateY(-3px)}
+.tool .ic{font-size:34px;line-height:1;height:40px;display:grid;place-items:center}
+.tool .ic.pic{height:auto;display:block;width:100%}
+.tool .ic.pic img{display:block;width:100%;height:auto;aspect-ratio:1/1;max-height:clamp(70px,15vh,130px);object-fit:contain;margin:0 auto;border-radius:12px;background:linear-gradient(160deg,#9fd0c6,#4f8d97)}
+.tool b{font-size:clamp(12.5px,1.05vw,15px);font-weight:800;text-align:center;line-height:1.2}
+.tool u{position:absolute;right:7px;top:6px;width:22px;height:22px;border-radius:50%;background:#2e9d5b;color:#fff;text-decoration:none;font-size:13px;font-weight:900;display:none;place-items:center}
+.tool.got{border-color:#2e9d5b;background:#eefaf1}.tool.got u{display:grid}
+.tool.bad{animation:shake .4s;border-color:#d24a3a;background:#fff1ef}
+.tool.need{border-color:#ffb627;animation:toolNeed 1.5s ease-in-out infinite}
+@keyframes toolNeed{0%,100%{box-shadow:0 0 0 0 #ffb62799,0 5px 14px #0003;background:#ffffffee}50%{box-shadow:0 0 0 7px #ffb62744,0 5px 14px #0003;background:#fff6d8}}
+.tool.hl{border-color:#ffb627;background:#fffbea;animation:toolHl 1s ease-in-out infinite;z-index:2}
+.tool.hl:after{content:"👆";position:absolute;right:6px;bottom:4px;font-size:30px;filter:drop-shadow(0 3px 4px #0008);animation:handTap 1s ease-in-out infinite}
+@keyframes toolHl{0%,100%{box-shadow:0 0 0 0 #ffb62799,0 5px 14px #0003}50%{box-shadow:0 0 0 10px #ffb62733,0 8px 22px #0005;transform:scale(1.04)}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+/* ===== BƯỚC 2: BÀN THÍ NGHIỆM 3D ===== */
+#sceneB{overflow:hidden}
+#sceneB canvas{display:block}
+.tbar{position:absolute;left:12px;top:12px;z-index:6;display:flex;gap:8px}
+.tb{border:0;background:#e8f0ef;color:#16423c;border-radius:12px;padding:10px 15px;font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 2px 8px #0003;transition:.15s}
+.tb:hover{background:#fff;transform:translateY(-1px)}
+.tb.off{background:#cfe0de}
+.rotHint{position:absolute;left:50%;transform:translateX(-50%);z-index:5;background:#0b2a2ccc;color:#fff;border:1px solid #ffffff55;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;white-space:nowrap;transition:opacity .6s;pointer-events:none}
+.loading3{position:absolute;inset:0;z-index:8;display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;background:#0f3a3acc}
+.clock3{position:absolute;left:calc(50% - 120px);top:64px;transform:translateX(-50%);z-index:7;display:flex;align-items:center;gap:12px;background:#0b2a2ce8;color:#fff;border:2px solid #ffd23f;border-radius:20px;padding:8px 18px 8px 10px;box-shadow:0 8px 24px #0008;pointer-events:none;animation:floatIn .3s ease}
+.clock3 svg{width:62px;height:62px;flex:0 0 auto}
+.clock3 b{display:block;font-size:20px;font-weight:900;letter-spacing:.02em;white-space:nowrap}
+.clock3 small{display:block;font-size:13px;color:#cfe6e0;font-weight:700;white-space:nowrap}
+.clock3 .bar{height:6px;border-radius:9px;background:#ffffff2e;margin-top:5px;overflow:hidden}.clock3 .bar i{display:block;height:100%;width:0;background:#ffd23f}
+#ln3{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+#ln3 line{stroke:#e6f27c;stroke-width:1.5;stroke-dasharray:4 3}
+#ln3 circle{fill:#d4ef73;stroke:#16423c;stroke-width:1.5}
+.n3{position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;white-space:nowrap;pointer-events:none}
+.n3.lf{flex-direction:row-reverse}
+.n3 b{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:#d4ef73;color:#16423c;font-size:13px;font-weight:900;display:grid;place-items:center;box-shadow:0 0 0 2px #16423c66,0 3px 8px #0007}
+.n3 span{font-size:clamp(11.5px,1vw,13.5px);font-weight:800;color:#fff;background:#0b2a2cd9;border:1px solid #ffffff38;border-radius:8px;padding:2px 9px}
+.n3.on b{background:#ffd23f;box-shadow:0 0 0 4px #ffd23f66,0 3px 8px #0007}.n3.on span{border-color:#ffd23f;color:#ffe27a}
+.hand3{position:absolute;left:0;top:0;z-index:6;pointer-events:none;width:34px;height:40px}
+.hand3 span{position:absolute;left:0;top:6px;font-size:34px;line-height:1;filter:drop-shadow(0 3px 4px #000b);animation:handTap 1s ease-in-out infinite}
+.hand3 i{position:absolute;left:3px;top:-6px;width:28px;height:28px;border-radius:50%;border:3px solid #ffd23f;opacity:0;animation:handRing 1s ease-out infinite}
+@keyframes handTap{0%,100%{transform:translateY(8px) scale(1)}45%{transform:translateY(-2px) scale(.94)}55%{transform:translateY(-2px) scale(.94)}}
+@keyframes handRing{0%,40%{opacity:0;transform:scale(.4)}55%{opacity:.95;transform:scale(.6)}100%{opacity:0;transform:scale(1.5)}}
+
+/* ===== BƯỚC 3: QUAN SÁT KẾT QUẢ ===== */
+#sceneC{overflow:hidden;background:#195658}
+#obs{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#obs.dragging{cursor:grabbing}
+.guide3{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;padding:70px 14px 110px;background:rgba(10,44,46,.86);backdrop-filter:blur(4px);animation:floatIn .4s ease}
+.gbox{background:#fff;border-radius:20px;padding:18px 20px 16px;width:min(100%,560px);box-shadow:0 18px 50px #000a;max-height:100%;overflow:auto}
+.gbox h4{margin:0 0 12px;font-size:clamp(17px,1.8vw,22px);color:var(--teal)}
+.gbox ol{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:10px}
+.gbox li{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:center;font-size:clamp(14px,1.2vw,16.5px);line-height:1.45;color:#2e4d48}
+.gbox li i{font-style:normal;font-size:26px;width:42px;height:42px;border-radius:50%;background:#e6f3e0;display:grid;place-items:center}
+.gbox .pill1{display:flex;margin:0 auto}
+.obsInfo{position:absolute;left:14px;top:14px;z-index:6;width:min(360px,calc(100% - 270px));background:#ffffffee;border-radius:16px;padding:12px 14px;box-shadow:0 12px 32px #0004;font-size:14.5px;line-height:1.5;color:#2e4d48;animation:floatIn .3s ease}
+.obsInfo{padding-right:52px}
+.obsInfo .xbtn{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:99px;background:#EEF3F2;color:#1d3b37;font-size:14px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.obsInfo .xbtn:hover{background:#DCE6E4}
+.obsInfo h5{margin:0 0 4px;font-size:16px;color:var(--teal)}
+.obsInfo .sw{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px;box-shadow:0 0 0 2px #fff,0 0 0 3px #0003}
+.obsInfo.concl{border:2px solid #2e9d5b;background:#f3fcf5}
+.obsTools{position:absolute;left:14px;bottom:14px;z-index:6;display:flex;gap:8px;flex-wrap:wrap}
+
+
+/* ===== MÀN HÌNH NHỎ ===== */
+@media(max-width:860px){
+}
+@media(max-width:760px){
+  header{height:48px;flex-basis:48px;padding:6px 8px;gap:8px}
+  .brand-logo{height:24px}
+  .headtext{padding-left:8px}.headtext b{font-size:8px}.headtext strong{font-size:11px}
+  .headtools button{display:grid;place-items:center;min-width:34px;height:34px;padding:7px}
+  .headtools button .tx{display:none}
+  .headtools button .ic{font-size:17px;line-height:1}
+  main{height:calc(100dvh - 48px)}
+  .step{max-width:170px;font-size:10px;min-height:28px}
+  .intro-inner h1{font-size:34px}
+  .stageTabs{display:none}
+  .card{left:8px;right:8px;top:8px;width:auto;margin:0;max-height:none;padding:10px 13px 11px;border-radius:14px}
+  .card .k{display:flex;font-size:12px}.card .badge{font-size:13px}
+  .card h2{font-size:16px;margin:3px 0}
+  .csteps{flex-direction:row;gap:4px;margin-top:7px}
+  .csteps span{flex:1;flex-direction:column;justify-content:flex-start;text-align:center;gap:3px;font-size:11.5px}
+  .csteps span b{flex:none;width:24px;height:24px;font-size:13px}
+  .s1-bottom{padding:0 12px 12px;gap:8px}
+  .s1-info{font-size:14px;padding:8px 12px;gap:10px}
+  .s1-info .say{width:36px;height:36px}
+  .pill1{font-size:14px;padding:8px 14px}.pill1.go{font-size:15px;padding:9px 16px}
+  #sceneA{padding:96px 12px 140px}
+  .tools{gap:8px}.tools .tool{flex:0 0 calc((100% - 16px)/3)}
+  .tool{padding:8px 4px}.tool .ic{font-size:28px;height:34px}.tool b{font-size:12px}
+  .tool .ic.pic img{max-height:80px}
+  .tb{padding:8px 11px;font-size:12px}
+  .n3 span{display:none}.n3 b{width:22px;height:22px;font-size:12px}
+  .obsInfo{left:8px;right:8px;width:auto;top:auto;bottom:140px}
+  .obsTools{bottom:auto;top:10px}
+  .toast{font-size:14px}
+  .clock3{top:auto;bottom:150px;left:50%}.clock3 svg{width:48px;height:48px}.clock3 b{font-size:16px}
+}
+@media(max-height:650px) and (min-width:761px){
+  header{height:44px;flex-basis:44px}
+  main{height:calc(100dvh - 44px)}
+}
+/* ===== BƯỚC 1: BÀN THÍ NGHIỆM CÓ ĐÁNH SỐ + THANH NÚT NỔI ===== */
+#sceneA{display:block}
+.tbl{position:relative;width:100%;height:100%}
+.tbl .top{position:absolute;left:1%;right:1%;top:22%;bottom:0;border-radius:50%/26%;background:radial-gradient(ellipse at 50% 25%,#d9f4f9,#a3dae5 70%,#8ccddb);box-shadow:0 22px 40px #0005,inset 0 -10px 0 #7fc3d1}
+.tbl .tray{position:absolute;background:#f8fbfb;border-radius:22px;box-shadow:0 10px 20px #0003,inset 0 0 0 5px #fff,inset 0 0 0 7px #e1ebeb}
+.ti{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;border:0;background:none;padding:0;cursor:pointer;--w:clamp(50px,min(7.5vw,12vh),108px);color:#16423c}
+.ti .mk{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#c7e36e;border:2px solid #fff;color:#16423c;font-size:14px;font-weight:900;box-shadow:0 2px 8px #0004;transition:transform .15s}
+.ti .ln{height:var(--h,30px);border-left:2px dashed #c7e36e}
+.ti .ic{display:block;width:var(--w);font-size:34px;line-height:1;text-align:center;transition:transform .15s}
+.ti .ic img{display:block;width:100%;aspect-ratio:1/1;object-fit:contain}
+.ti .nm{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:2px;background:#0b2a2ccc;color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:3}
+.ti:hover .nm,.ti:focus-visible .nm{opacity:1}
+.ti:hover .ic{transform:translateY(-4px)}.ti:hover .mk{transform:scale(1.12)}
+.ti.got .mk{background:#2e9d5b;color:#fff}.ti.got .ln{border-left-color:#2e9d5b}
+.ti.hl .mk{animation:toolHl 1s ease-in-out infinite;background:#ffd23f}
+/* thẻ hướng dẫn gộp liền với tab bước đang làm */
+.stageTabs{max-height:calc(100% - 28px);overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.stageTabs .card{position:static;width:auto;max-height:none;height:auto!important;overflow:visible;margin-top:-8px;animation:none;background:#fff;border:2px solid #b5d63a;border-top:0;border-radius:0 0 12px 12px;box-shadow:0 4px 12px #0003;backdrop-filter:none}
+.stab.on:has(+ .card){border-radius:12px 12px 0 0;box-shadow:none}
+.dz{position:absolute;left:0;top:0;width:68px;height:68px;border:3px dashed #ffd23f;border-radius:50%;pointer-events:none;animation:dzPulse 1.1s ease-in-out infinite;box-shadow:0 0 14px #ffd23f88}
+@keyframes dzPulse{50%{transform-origin:center;opacity:.45}}
+#ln3{display:none}
+#lbl3.numonly .n3 span{display:none}
+#lbl3.numonly .n3 b{pointer-events:auto;cursor:pointer}
+.n3.got b{background:#2e9d5b;color:#fff}
+.ttip{position:absolute;z-index:8;width:300px;max-width:calc(100% - 16px);background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 10px 28px #0005;animation:floatIn .25s ease}
+.ttip .pc-body{padding-right:38px}
+.ttip .kick{font-size:11px;font-weight:700;color:var(--muted)}
+.ttip h3{font-size:17px;margin:6px 0;color:var(--ink)}
+.ttip p{margin:0;font-size:14px;line-height:1.5;color:#2e4d48}
+.ttip .xbtn{position:absolute;top:10px;right:10px;width:32px;height:32px;border:none;border-radius:99px;background:#EEF3F2;color:#1d3b37;font-size:14px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.ttip .xbtn:hover{background:#DCE6E4}
+.ftb{display:none;position:absolute;left:16px;top:16px;z-index:11;align-items:center;gap:4px;padding:8px;background:#fff;border-radius:14px;box-shadow:0 6px 20px #0004}
+.ftb button{width:40px;height:40px;border:0;background:none;border-radius:10px;display:grid;place-items:center;color:#16423c;cursor:pointer;position:relative}
+.ftb button[hidden]{display:none}
+.ftb button:hover{background:#eef3f2}
+.ftb svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ftb .sep{width:1px;height:26px;background:#dbe5e2;margin:0 4px}
+.ftb #ftSound.off:after{content:"";position:absolute;width:24px;height:2px;background:currentColor;transform:rotate(45deg);border-radius:2px}
+@media(min-width:761px){.ftb{display:flex}.headtools,.tbar{display:none}.obsInfo{top:84px}body.rep .ftb{display:none}}
+@media(max-width:760px){
+  #sceneA{overflow:auto}
+  .tbl{height:auto;display:flex;flex-wrap:wrap;gap:6px 4px;justify-content:center;align-content:flex-start}
+  .tbl .top,.tbl .tray{display:none}
+  .ti{position:static;transform:none;flex:0 0 31%;--w:min(24vw,88px)}
+  .ti .ln{height:8px}.ti .nm{position:static;transform:none;opacity:1;background:none;color:#fff;white-space:normal;text-align:center;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001s!important;animation-iteration-count:1!important}}
+
+/* ===== BỔ SUNG: KHÁM PHÁ BỨC XẠ NHIỆT ===== */
+/* nền màn hình mở đầu: bóng đèn phát sáng + tia cam toả chậm */
+.intro-img{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,#ffd98a66 0,#ff9a3c28 22%,transparent 48%);filter:none;animation:none}
+.irays{position:absolute;left:50%;top:42%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;background:repeating-conic-gradient(from 0deg,rgba(255,150,60,.36) 0 1.2deg,transparent 1.2deg 9deg);-webkit-mask:radial-gradient(circle,#000 0,#000 16%,transparent 50%);mask:radial-gradient(circle,#000 0,#000 16%,transparent 50%);animation:irot 90s linear infinite}
+@keyframes irot{to{transform:rotate(360deg)}}
+.ibulb{position:absolute;left:50%;top:42%;width:min(34vmin,300px);transform:translate(-50%,-50%);opacity:.55;filter:drop-shadow(0 0 40px #ffb347);animation:ipulse 4s ease-in-out infinite}
+@keyframes ipulse{50%{opacity:.8;filter:drop-shadow(0 0 70px #ffc56a)}}
+.intro-screen .gcells i{background:radial-gradient(circle at 35% 30%,#fff1b8cc 0,#ffc46acc 38%,#ff8a2a88 72%,#c8561a44 100%);box-shadow:inset 0 0 14px #ffffff55}
+.intro-spk{position:absolute;right:18px;bottom:18px;z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid #ffffff70;background:#ffffff1c;color:#fff;font-size:18px;display:grid;place-items:center;backdrop-filter:blur(4px)}
+.intro-spk:hover{background:#c7e85e;color:#174d4b}
+/* hộp dự đoán (không phủ tối toàn màn hình) */
+.predict{position:absolute;left:0;right:240px;bottom:0;z-index:9;display:flex;justify-content:center;padding:0 14px 12px;pointer-events:none}
+.predict .gbox{pointer-events:auto;width:min(100%,640px);padding:14px 16px 12px}
+.predict h4{font-size:clamp(15px,1.5vw,19px);margin:0 0 10px}
+.predict .opts{display:grid;gap:7px}
+.pill1.opt{display:flex;width:100%;text-align:left;justify-content:flex-start;border-radius:14px;font-size:clamp(13px,1.05vw,15.5px);font-weight:700;padding:7px 12px;box-shadow:none;line-height:1.35}
+.pill1.opt b{flex:0 0 28px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e6f3e0;color:#2c6a1f;font-size:14px}
+.pill1.opt.sel{background:#ffd23f;border-color:#fff;box-shadow:0 0 0 3px #e0a21b}
+.pill1.opt.sel b{background:#fff3b8;color:#2b1d00}
+/* thẻ loại trừ ở bước 4 */
+.chk{position:absolute;left:14px;bottom:12px;z-index:9;width:min(310px,calc(100% - 28px));background:#fff;border-radius:18px;padding:12px 14px 8px;box-shadow:0 14px 40px #0007;animation:floatIn .3s ease}
+.chk h4{margin:0 0 8px;font-size:15px;line-height:1.3;color:var(--teal)}
+.chk .row{display:grid;gap:7px}
+.chk .pill1{width:100%;justify-content:flex-start;margin:0;font-size:14px;padding:8px 12px;box-shadow:none;border-radius:14px}
+.chk .pill1.no{background:#fde8e4;border-color:#e08a7c}
+.chk .pill1.yes{background:#dcf5e3;border-color:#2e9d5b}
+.chk small{display:block;margin:6px 0 0;font-size:11.5px;color:#68817a}
+/* đồ thị nhiệt độ – thời gian */
+.graph3{position:absolute;left:16px;top:84px;z-index:7;width:220px;height:110px;background:#fff;border-radius:14px;box-shadow:0 8px 24px #0006;overflow:hidden;pointer-events:none}
+.graph3 canvas{display:block;width:100%;height:100%}
+/* nhãn nhiệt kế, nhãn chú thích trên cảnh 3D */
+.thl,.tag3{position:absolute;left:0;top:0;white-space:nowrap;pointer-events:none;font-weight:800}
+.thl{background:#fff;color:#16423c;border:2px solid var(--c,#4a90d9);border-radius:10px;padding:2px 9px;font-size:clamp(12px,1vw,14px);box-shadow:0 3px 10px #0006}
+.tag3{background:#0b2a2cee;color:#fff;border:2px solid var(--c,#ffd23f);border-radius:10px;padding:3px 10px;font-size:clamp(11.5px,1vw,13.5px);box-shadow:0 3px 10px #0006;animation:floatIn .3s ease}
+.tag3[hidden],.thl[hidden]{display:none}
+.chip3{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:6;background:#fff3cdee;color:#6b4a00;border:1.5px solid #e0a21b;border-radius:99px;padding:5px 14px;font-size:12.5px;font-weight:700;pointer-events:none;white-space:nowrap}
+.thermBadge{position:absolute;right:252px;top:14px;z-index:7;background:#ff6a2bee;color:#fff;border-radius:99px;padding:6px 14px;font-size:13px;font-weight:900;letter-spacing:.04em;box-shadow:0 4px 14px #0007;pointer-events:none}
+.thermBadge:before{content:"● ";animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.2}}
+.ftb #ftCam svg{width:22px;height:22px}
+.ftb #ftCam.on{background:#ffe9c7;color:#b34a00}
+.tb.on{background:#ffd23f}
+/* bước 5: thẻ kết luận */
+#sceneC{overflow:auto;background:transparent;display:flex;padding:14px 250px 130px 14px}
+.cc{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;background:#fff;border:2px solid #2e9d5b;border-radius:20px;padding:18px;box-shadow:0 18px 50px #0008;max-width:1040px;width:100%;margin:auto;animation:floatIn .4s ease}
+.cc svg{width:100%;height:auto;display:block;background:#10303a;border-radius:14px}
+.ck{display:grid;gap:9px;align-content:start}
+.ck h3{margin:0 0 2px;font-size:clamp(17px,1.7vw,22px);color:var(--teal)}
+.ci{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;font-size:clamp(13.5px,1.1vw,15.5px);line-height:1.45;color:#2e4d48;background:#f3fcf5;border-radius:14px;padding:9px 12px}
+.ci i{font-style:normal;font-size:24px;width:44px;height:44px;border-radius:50%;background:#e6f3e0;display:grid;place-items:center}
+.cl{margin:2px 0 0;font-style:italic;font-weight:700;color:var(--teal2);font-size:clamp(14px,1.15vw,16px)}
+.cs{margin:0;font-size:13px;color:#4a6660}
+@media(max-width:760px){
+  .predict{right:0;padding:0 8px 8px}
+  .chk{left:8px;right:8px;width:auto;padding:8px 8px 4px}.chk h4{display:none}.chk .row{display:flex;gap:6px}.chk .pill1{font-size:12px;padding:7px 8px;gap:4px;justify-content:center;text-align:center;line-height:1.2}
+  .chk small{display:none}
+  .graph3{left:8px;width:160px;height:80px}
+  .chip3{display:none}
+  .thermBadge{right:8px;top:auto;bottom:150px}
+  #sceneC{padding:10px 8px 150px}
+  .cc{grid-template-columns:1fr;padding:12px}
+  .intro-spk{right:10px;bottom:10px}
+}
+
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+
+<body class="intro-active">
+
+<section id="introScreen" class="intro-screen">
+  <div class="intro-bg" aria-hidden="true">
+    <div class="intro-img">
+      <div class="irays"></div>
+      <svg class="ibulb" viewBox="0 0 120 160" fill="none" stroke="#fff3c9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M60 8C34 8 16 27 16 52c0 17 8 28 17 38 6 7 9 13 9 22v6h36v-6c0-9 3-15 9-22 9-10 17-21 17-38C104 27 86 8 60 8z" fill="#ffd98a33"/><path d="M42 118h36M44 130h32M50 142h20"/><path d="M48 112V76l12 14 12-14v36" stroke="#ffb347"/></svg>
+    </div>
+    <div class="gcells" id="gcells"></div>
+  </div>
+  <div class="intro-tint" aria-hidden="true"></div>
+  <button id="moBtn" class="intro-spk" type="button" aria-label="Nghe lời chào mở đầu">🔊</button>
+  <div class="intro-inner">
+    <div class="intro-brand">
+      <img class="brand-logo" alt="YooBook" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaMAAABPCAMAAABxulqLAAAASFBMVEUZVlgZVlgZVlgZVlgZVlgZVlgZVlgZVlgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACrgPePAAAAGHRSTlMA/tAxbo+vTgAAAAAAAAAAAAAAAAAAAADmV4PhAAAFsElEQVR42u2dW5LjIAxFMQjY/46neibpShxJ6AqMyRR8xsYYHfOSLiSEnXbaaWCi45moL3vdtrwY0L+UsezllH1jGp7y8ZmKPXtkstO26tB08GlS9p18jQhoSlHMvpvS1a3I2Bb6cu9kS6nHzBvR8pA2ouUhbUTzUvUZeyO6cwlrMvdGtDykjWh5SBvR8pA2ouUhafduh+oSkDai5SFtRMtD2oiWh7QRrQuptBHtcERwBEZTGBVNekDaiMak4mfUhGRCZFovTVtTHY1Uv42RHxJh9u/RuIxldMuyu4uRCqnKwXGSzdIe+cLNjOZT6mOkQhKrTGBH9nZDup/R7MG0k5GiIxEhkaq4axURFmA0uSn1MtIgZbbOpBuG7pswAIziVzHSIHGVplYAXjVbXITR1AlePyMFEtOQctMy5cZmZGd0fBcjBdLHtQyvf+YO1nZG5QsYvRrT3NllE+UgalzCOoyO5RkVm++0vF/KNtvc1tO9F9eQrS3OqH60ePljs3kIpOZS1mF0ppTCyj5V7lUNjCL6zPnNSGf0DikvzEjomCVG2Thtbsefyu2Mwj2TBpRRFIdPgVE1rmzYuYXejDK2YEkGCzcYpXY7SiBHQyUwRlleCPGQft85Yu2z7air4EzL5nUDXIfVVkoG46QIowLFvqWrT0YR5d/wPyRwPmz1jQKMzKVkUDtvZkRCLlC+8HwReKDTezrNswFtJAAZVfu0r0NhnW2MEiCYy492x88nsn1GJs02IEFYn5bZ/qSMRABS11tFvoPV3jVzz8t/B8jIO4OCi5ELEVMY4hzVGRWnHLfpzdcrwTOyf06v3JiS331Gfk8MAf4a0L2TzIyiG9EnJKQSLCNzX5reR6+PNhZ/7hzjnAVcauYuSG+ip9EmalYpoHsPqgTHyDJTSq+zf5LiRT8/jHBpYl7P4leReP2pYB7D7VllZFxyEDMHNEqx4J2cxr2eXqODt5deqQpht38ygm1MYiwCj5qiNi98hyb2QYm1EWbs9lK0YqVkvmyZEezarXIsYlAAp0jWyE0FmGSlZLrf19M1L2SwEmdGcNSzyjPmOIiRKZzERjeqcRncNx4lsBT5dmJ7oROjiDrf0yGvPAdFQo3rNs4zYp2TExqHzdY4JFeKcnvmrr0zymgrSEpwPAw6N0rgUAx+HHMP1aU5AUvJWjtoMqroYJKYb75XZuVbvvCeGth/6tIzqH2P7s03edaj5H3xdUwvaq1Rug/hUjQEFirqLkEYFe5DtZSix5eYKsYe1YsmMhmlzQFCA/l8uXQxsoo1s59RMPkEY4c0SRMCjQpYE8Do44OO+ugKMzqZy+DGe39kMlSiAoyya5r87OsuEhWAEbhGdZiVYPMr1RkVS+gWDiOa3Jh2l8BjzhD+W0bMM29kdPi8NqlfZOVlNKGv4+64r69D9HCnNWy4iVG5es7QXu/MnTPozUHTpYYpjPrn3mkQo9vm3h6Zzb9pXZjDSF/+0YA1rPnlJq5hH10muhV/vNpXfuJUX5CH0dW+IGZXVwJlB1czQt2RVm+nPQR9DPDcKreXNqMC6gANEqXrGB3tAwK6YhNmH8i42ERuxSZ+fz28xzqGyxmRFPwDY3z1cDAi6ZMESyF/jO/3V9KG2usRqYY6rw8SK3IQY+XE/urax/eSjfpKaVUigl/TjB2iGqMVNCetBnC95kS10pQNor0qqeu1Wx4xVhih3SJ+eVemHzHsP+aYyVNGG6892F+ogaSmmSZts+6Q2Du0xNXHqPYdqnb4tMTUtNOknfA9Z7oP1OQfB7IT4piiyae2a6xOOYgKW0hC++Batu44nKHM2NtCeuDZsEdsFqMAzi3TkAPjx5Xi3yNGNktdf+CH/59ghu61xNcYEetkEt5Zk9VU6eKTJExWT2BzjvCeZY+EoGAZKtpXV8UKdfXTq2PC/j74uhMwwFLQSuy0004Xpz/niDH+XCKntgAAAABJRU5ErkJggg==">
+    </div>
+    <div class="intro-kicker">KHOA HỌC TỰ NHIÊN 8 · THÍ NGHIỆM</div>
+    <h1>Khám phá <em>bức xạ nhiệt</em></h1>
+    <p>Giữa Mặt Trời và Trái Đất là chân không, vậy nhiệt truyền tới bằng cách nào? Bật đèn, chắn tấm gỗ, soi camera tia nhiệt để tìm ra cách truyền nhiệt thứ ba.</p>
+    <div class="intro-rule"></div>
+    <button id="goBtn" class="intro-start" type="button">Bắt đầu thực hành <span>→</span></button>
+    <small>Được phát triển bởi YooBook</small>
+  </div>
+</section>
+
+<header>
+  <div class="logo">
+    <img class="brand-logo" alt="YooBook" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaMAAABPCAMAAABxulqLAAAASFBMVEUZVlgZVlgZVlgZVlgZVlgZVlgZVlgZVlgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACrgPePAAAAGHRSTlMA/tAxbo+vTgAAAAAAAAAAAAAAAAAAAADmV4PhAAAFsElEQVR42u2dW5LjIAxFMQjY/46neibpShxJ6AqMyRR8xsYYHfOSLiSEnXbaaWCi45moL3vdtrwY0L+UsezllH1jGp7y8ZmKPXtkstO26tB08GlS9p18jQhoSlHMvpvS1a3I2Bb6cu9kS6nHzBvR8pA2ouUhbUTzUvUZeyO6cwlrMvdGtDykjWh5SBvR8pA2ouUhafduh+oSkDai5SFtRMtD2oiWh7QRrQuptBHtcERwBEZTGBVNekDaiMak4mfUhGRCZFovTVtTHY1Uv42RHxJh9u/RuIxldMuyu4uRCqnKwXGSzdIe+cLNjOZT6mOkQhKrTGBH9nZDup/R7MG0k5GiIxEhkaq4axURFmA0uSn1MtIgZbbOpBuG7pswAIziVzHSIHGVplYAXjVbXITR1AlePyMFEtOQctMy5cZmZGd0fBcjBdLHtQyvf+YO1nZG5QsYvRrT3NllE+UgalzCOoyO5RkVm++0vF/KNtvc1tO9F9eQrS3OqH60ePljs3kIpOZS1mF0ppTCyj5V7lUNjCL6zPnNSGf0DikvzEjomCVG2Thtbsefyu2Mwj2TBpRRFIdPgVE1rmzYuYXejDK2YEkGCzcYpXY7SiBHQyUwRlleCPGQft85Yu2z7air4EzL5nUDXIfVVkoG46QIowLFvqWrT0YR5d/wPyRwPmz1jQKMzKVkUDtvZkRCLlC+8HwReKDTezrNswFtJAAZVfu0r0NhnW2MEiCYy492x88nsn1GJs02IEFYn5bZ/qSMRABS11tFvoPV3jVzz8t/B8jIO4OCi5ELEVMY4hzVGRWnHLfpzdcrwTOyf06v3JiS331Gfk8MAf4a0L2TzIyiG9EnJKQSLCNzX5reR6+PNhZ/7hzjnAVcauYuSG+ip9EmalYpoHsPqgTHyDJTSq+zf5LiRT8/jHBpYl7P4leReP2pYB7D7VllZFxyEDMHNEqx4J2cxr2eXqODt5deqQpht38ygm1MYiwCj5qiNi98hyb2QYm1EWbs9lK0YqVkvmyZEezarXIsYlAAp0jWyE0FmGSlZLrf19M1L2SwEmdGcNSzyjPmOIiRKZzERjeqcRncNx4lsBT5dmJ7oROjiDrf0yGvPAdFQo3rNs4zYp2TExqHzdY4JFeKcnvmrr0zymgrSEpwPAw6N0rgUAx+HHMP1aU5AUvJWjtoMqroYJKYb75XZuVbvvCeGth/6tIzqH2P7s03edaj5H3xdUwvaq1Rug/hUjQEFirqLkEYFe5DtZSix5eYKsYe1YsmMhmlzQFCA/l8uXQxsoo1s59RMPkEY4c0SRMCjQpYE8Do44OO+ugKMzqZy+DGe39kMlSiAoyya5r87OsuEhWAEbhGdZiVYPMr1RkVS+gWDiOa3Jh2l8BjzhD+W0bMM29kdPi8NqlfZOVlNKGv4+64r69D9HCnNWy4iVG5es7QXu/MnTPozUHTpYYpjPrn3mkQo9vm3h6Zzb9pXZjDSF/+0YA1rPnlJq5hH10muhV/vNpXfuJUX5CH0dW+IGZXVwJlB1czQt2RVm+nPQR9DPDcKreXNqMC6gANEqXrGB3tAwK6YhNmH8i42ERuxSZ+fz28xzqGyxmRFPwDY3z1cDAi6ZMESyF/jO/3V9KG2usRqYY6rw8SK3IQY+XE/urax/eSjfpKaVUigl/TjB2iGqMVNCetBnC95kS10pQNor0qqeu1Wx4xVhih3SJ+eVemHzHsP+aYyVNGG6892F+ogaSmmSZts+6Q2Du0xNXHqPYdqnb4tMTUtNOknfA9Z7oP1OQfB7IT4piiyae2a6xOOYgKW0hC++Batu44nKHM2NtCeuDZsEdsFqMAzi3TkAPjx5Xi3yNGNktdf+CH/59ghu61xNcYEetkEt5Zk9VU6eKTJExWT2BzjvCeZY+EoGAZKtpXV8UKdfXTq2PC/j74uhMwwFLQSuy0004Xpz/niDH+XCKntgAAAABJRU5ErkJggg==">
+  </div>
+  <div class="headtext"><b>KHOA HỌC TỰ NHIÊN 8 – THÍ NGHIỆM</b><strong>Khám phá bức xạ nhiệt</strong></div>
+  <div class="headtools"><button id="sound" aria-label="Bật / tắt âm thanh"><span class="ic">🔊</span><span class="tx"> Âm thanh</span></button><button id="full" aria-label="Toàn màn hình"><span class="ic">⛶</span></button></div>
+</header>
+<main>
+  <div class="lesson-layout">
+    <section class="viewer" id="viewer">
+      <div class="view-content"><div class="visual" id="visual">
+        <div class="view s0" id="view">
+          <div id="sceneB" hidden></div>
+          <div id="sceneC" hidden></div>
+          <div class="toast" id="toast" role="status"></div>
+        </div>
+        <div class="stageTabs" id="stageTabs"></div>
+        <div class="card" id="card"><div class="k"><span id="cK"></span><span class="badge" id="cB"></span></div><h2 id="cT"></h2><p id="cP"></p><div class="csteps" id="cSteps"></div><div class="cguide" id="cGuide"></div></div>
+        <div class="s1-bottom" id="bottom" aria-live="polite"><div class="s1-info" id="binfo"></div><div class="s1-pills" id="bpills"></div></div>
+      </div></div>
+    </section>
+    <div class="rail">
+      <nav class="steps" id="steps" aria-label="Các bước bài học"><div class="steps-track" id="stepsTrack"></div></nav>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+
+/* =====================================================================
+   KHÁM PHÁ BỨC XẠ NHIỆT (KHTN 8 – Bài 28 – Hình 28.5)
+   5 bước: Chuẩn bị dụng cụ · Dự đoán · Thí nghiệm · Tia nhiệt · Kết luận
+   ===================================================================== */
+const $id=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function rng(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const view=$id('view');
+const DEBUG=/[?&]debug/.test(location.search);
+const STAGES=[
+  {short:'Chuẩn bị dụng cụ', tab:'Chuẩn bị dụng cụ',       badge:'Chuẩn bị',  goal:'Tìm hiểu các dụng cụ thí nghiệm'},
+  {short:'Dự đoán',          tab:'Dự đoán hiện tượng',     badge:'Dự đoán',   goal:'Dự đoán nhiệt độ trong bình'},
+  {short:'Thí nghiệm',       tab:'Thí nghiệm Hình 28.5',   badge:'Thực hành', goal:'Bật đèn, chắn tấm gỗ, theo dõi nhiệt kế'},
+  {short:'Tia nhiệt',        tab:'Tia nhiệt và bề mặt vật',badge:'Khám phá',  goal:'Tìm ra cách năng lượng truyền từ đèn tới bình'},
+  {short:'Kết luận',         tab:'Kết luận',               badge:'Kết luận',  goal:'Rút ra khái niệm bức xạ nhiệt'}
+];
+const S={stage:0,narr:true,lastSay:null,lastVk:null,active:false,ok:[false,false,false,false,false],miss:false,predict:null,played:{},speed:1,vok:0,moDone:false};
+const LOCKMSG=['','Em hãy xem các dụng cụ ở bước 1 trước nhé.','Em hãy chọn dự đoán ở bước 2 trước nhé.','Em hãy làm xong thí nghiệm ở bước 3 trước nhé.','Em hãy tìm ra cách truyền nhiệt ở bước 4 trước nhé.'];
+const canGo=i=>true;   /* mở khóa tất cả các bước */
+
+/* ===== GIỌNG ĐỌC ===== */
+let viVoice=null;
+function pickVoice(){ try{ const v=speechSynthesis.getVoices(); viVoice=v.find(x=>/^vi[-_]?VN/i.test(x.lang))||v.find(x=>/^vi/i.test(x.lang))||null; }catch(e){} }
+if(window.speechSynthesis){ pickVoice(); try{ speechSynthesis.addEventListener('voiceschanged',pickVoice); }catch(e){} }
+const VOICE={
+  mo:'',                                                              // 01 Mở đầu — CHƯA CÓ FILE (đọc VTEXT bằng giọng trình duyệt)
+  dc:'https://assets.yoolife.com.vn/yootek/1793989517913-2363.mp3',  // 02 Dụng cụ
+  dd:'https://assets.yoolife.com.vn/yootek/1793989522486-7701.mp3',  // 03 Dự đoán
+  bd:'https://assets.yoolife.com.vn/yootek/1793989526852-5207.mp3',  // 04 Bật đèn
+  cg:'https://assets.yoolife.com.vn/yootek/1793989530762-2975.mp3',  // 05 Chắn gỗ
+  kq:'https://assets.yoolife.com.vn/yootek/1793989534857-9622.mp3',  // 06 Kết quả thí nghiệm
+  dn:'https://assets.yoolife.com.vn/yootek/1793989539035-9684.mp3',  // 07 Không phải dẫn nhiệt
+  dl:'https://assets.yoolife.com.vn/yootek/1793989543028-3474.mp3',  // 08 Không phải đối lưu
+  tn:'https://assets.yoolife.com.vn/yootek/1793989547094-6440.mp3',  // 09 Tia nhiệt
+  bm:'https://assets.yoolife.com.vn/yootek/1793989551265-4740.mp3',  // 10 Bề mặt
+  kb:'https://assets.yoolife.com.vn/yootek/1793989555299-7607.mp3',  // 11 Kết quả bề mặt
+  kl:'https://assets.yoolife.com.vn/yootek/1793989734413-9016.mp3'   // 12 Kết luận
+};
+const VTEXT={
+  mo:'Chào mừng em đến với thí nghiệm khám phá bức xạ nhiệt. Ở phần trước, chúng ta đã thắc mắc: giữa Mặt Trời và Trái Đất là chân không, chẳng có chất lưu nào, vậy nhiệt truyền tới bằng cách nào? Hôm nay chúng ta sẽ tìm ra một cách truyền nhiệt mới. Em hãy bấm Bắt đầu nhé!',
+  dc:'Đây là bàn thí nghiệm. Em hãy bấm vào từng số để xem tên và công dụng của các dụng cụ: bình thủy tinh phủ đen có cắm nhiệt kế, bình thủy tinh tráng bạc, đèn điện dây tóc, tấm gỗ dày và giá đỡ.',
+  dd:'Bình thủy tinh phủ đen được đặt cạnh một bóng đèn. Nếu bật đèn, nhiệt độ trong bình sẽ thay đổi thế nào? Và nếu đặt một tấm gỗ chắn giữa đèn và bình thì sao? Em hãy chọn một đáp án.',
+  bd:'Em hãy bấm công tắc để bật đèn, rồi quan sát nhiệt kế trong bình thủy tinh phủ đen.',
+  cg:'Nhiệt độ trong bình đang tăng lên. Bây giờ em hãy kéo tấm gỗ đặt vào giữa đèn và bình, rồi tiếp tục quan sát nhiệt kế.',
+  kq:'Khi bật đèn, nhiệt độ trong bình tăng lên. Khi có tấm gỗ chắn, nhiệt độ giảm dần về như cũ. Bỏ tấm gỗ ra, nhiệt độ lại tăng. Vậy năng lượng từ đèn đã truyền tới bình bằng cách nào? Em hãy kiểm tra lần lượt từng khả năng nhé.',
+  dn:'Có phải là dẫn nhiệt không? Giữa đèn và bình chỉ có không khí, mà không khí dẫn nhiệt kém nhất. Vì vậy, nhiệt không thể truyền tới bình nhanh như thế bằng dẫn nhiệt.',
+  dl:'Có phải là đối lưu không? Không khí được đèn làm nóng sẽ bay lên phía trên, chứ không đi ngang sang bình. Hơn nữa, một tấm gỗ không thể chặn được dòng không khí đi lên. Vậy đây cũng không phải là đối lưu.',
+  tn:'Hãy bật camera tia nhiệt. Em thấy không? Đèn phát ra những tia đi thẳng tới bình, và bị tấm gỗ chặn lại. Đó là các tia nhiệt. Tia nhiệt có tính chất giống tia sáng: mang năng lượng, truyền thẳng, phản xạ được và không truyền qua vật chắn sáng. Hình thức truyền nhiệt này gọi là bức xạ nhiệt.',
+  bm:'Bây giờ, em hãy đặt thêm một bình thủy tinh tráng bạc, cách đèn bằng bình phủ đen. Theo em, bình nào sẽ nóng lên nhanh hơn? Hãy bật đèn và quan sát hai nhiệt kế.',
+  kb:'Bình phủ đen nóng lên nhanh hơn hẳn. Mặt ngoài sẫm màu và xù xì hấp thụ tia nhiệt mạnh. Còn mặt ngoài sáng màu và nhẵn bóng lại phản xạ tia nhiệt, nên bình tráng bạc nóng chậm hơn.',
+  kl:'Năng lượng nhiệt được truyền bằng các tia nhiệt gọi là bức xạ nhiệt. Tia nhiệt truyền được cả trong chân không, nhờ vậy Mặt Trời mới sưởi ấm được Trái Đất. Mặt ngoài của vật càng sẫm màu và càng xù xì thì hấp thụ tia nhiệt càng mạnh, càng nhẵn và sáng màu thì phản xạ tia nhiệt càng mạnh. Vậy vì sao Trái Đất giữ được hơi ấm của Mặt Trời? Cùng khám phá ở phần tiếp theo nhé!'
+};
+const _pre=[]; Object.keys(VOICE).forEach(k=>{ if(VOICE[k]){ try{ const a=new Audio(VOICE[k]); a.preload='auto'; _pre.push(a); }catch(e){} } });
+const _aud=new Audio(); _aud.preload='auto'; let _onEnd=null, _fb=null;
+_aud.addEventListener('ended',()=>{ const f=_onEnd; _onEnd=null; _fb=null; if(f){ try{ f(); }catch(e){} } });
+_aud.addEventListener('playing',()=>{ S.vok=1; });
+_aud.addEventListener('error',()=>{ const f=_fb; _fb=null; if(f) f(); });
+function stopSpeak(){ _onEnd=null; _fb=null; try{ _aud.pause(); }catch(e){} try{ window.speechSynthesis&&speechSynthesis.cancel(); }catch(e){} }
+/* chỉ một giọng tại một thời điểm; có URL → phát file; URL rỗng / lỗi → đọc VTEXT bằng giọng trình duyệt (không có giọng vi-VN thì im lặng) */
+function speak(html,force,key,onEnd){
+  S.lastSay=html; S.lastVk=key||null; stopSpeak(); if(!html&&!key) return; if(!S.narr&&!force) return;
+  const url=key&&VOICE[key], txt=html||(key&&VTEXT[key]);
+  const say=()=>{ if(!txt||!viVoice) return; const t=String(txt).replace(/<[^>]+>/g,'').replace(/[→↑↓]/g,' ').replace(/\s+/g,' ').trim(); if(!t) return;
+    const u=new SpeechSynthesisUtterance(t); u.voice=viVoice; u.lang=viVoice.lang; u.rate=1; u.onstart=()=>{ S.vok=1; }; if(onEnd) u.onend=()=>{ try{ onEnd(); }catch(e){} };
+    try{ speechSynthesis.speak(u); }catch(e){} };
+  if(url){ _onEnd=onEnd||null; _fb=say; try{ _aud.src=url; _aud.currentTime=0; const pr=_aud.play(); if(pr&&pr.catch) pr.catch(err=>{ if(!(err&&err.name==='NotAllowedError')){ const f=_fb; _fb=null; if(f) f(); } }); }catch(e){ say(); } return; }
+  say();
+}
+/* mỗi voice tự phát đúng 1 lần (S.played); nút loa .say nghe lại */
+function voiceOnce(key,onEnd){ if(S.played[key]) return false; S.played[key]=true; speak(null,false,key,onEnd); return true; }
+
+/* ===== ÂM THANH (WebAudio) ===== */
+const AC=()=>beep.c||(beep.c=new (window.AudioContext||window.webkitAudioContext)());
+function beep(ok){ if(!S.narr) return; try{ const a=AC();
+  (ok?[[660,0],[880,.12]]:[[220,0],[170,.14]]).forEach(([f,d])=>{ const o=a.createOscillator(), g=a.createGain(); o.type=ok?'sine':'triangle'; o.frequency.value=f; g.gain.setValueAtTime(0,a.currentTime+d); g.gain.linearRampToValueAtTime(.1,a.currentTime+d+.02); g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d+.22); o.connect(g); g.connect(a.destination); o.start(a.currentTime+d); o.stop(a.currentTime+d+.25); }); }catch(e){} }
+function noiseBuf(a,dur){ const b=a.createBuffer(1,Math.max(1,Math.floor(a.sampleRate*dur)),a.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; return b; }
+function sfx(name){
+  if(!S.narr) return;
+  try{ const a=AC(); if(a.state==='suspended') a.resume(); const t=a.currentTime;
+    const env=(g,v,at,dur)=>{ g.gain.setValueAtTime(0,t+at); g.gain.linearRampToValueAtTime(v,t+at+.005); g.gain.exponentialRampToValueAtTime(.0001,t+at+dur); };
+    if(name==='click'){ const o=a.createOscillator(), g=a.createGain(); o.type='square'; o.frequency.value=1500; env(g,.05,0,.04); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+.06); }
+    else if(name==='thud'){ const n=a.createBufferSource(), lp=a.createBiquadFilter(), g=a.createGain(); n.buffer=noiseBuf(a,.14); lp.type='lowpass'; lp.frequency.value=420; env(g,.16,0,.12); n.connect(lp); lp.connect(g); g.connect(a.destination); n.start(t);
+      const o=a.createOscillator(), g2=a.createGain(); o.type='sine'; o.frequency.setValueAtTime(130,t); o.frequency.exponentialRampToValueAtTime(70,t+.12); env(g2,.14,0,.14); o.connect(g2); g2.connect(a.destination); o.start(t); o.stop(t+.18); }
+    else if(name==='whoosh'){ const n=a.createBufferSource(), bp=a.createBiquadFilter(), g=a.createGain(); n.buffer=noiseBuf(a,.5); bp.type='bandpass'; bp.Q.value=1.2; bp.frequency.setValueAtTime(300,t); bp.frequency.exponentialRampToValueAtTime(1400,t+.4); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.07,t+.15); g.gain.exponentialRampToValueAtTime(.0001,t+.5); n.connect(bp); bp.connect(g); g.connect(a.destination); n.start(t); }
+    else if(name==='tada'){ [523,659,784].forEach((f,i)=>{ const o=a.createOscillator(), g=a.createGain(); o.type='sine'; o.frequency.value=f; env(g,.08,i*.13,.3); o.connect(g); g.connect(a.destination); o.start(t+i*.13); o.stop(t+i*.13+.34); }); }
+  }catch(e){}
+}
+/* tiếng ù rất nhỏ khi đèn sáng (100 Hz + bội âm) */
+const HUM={want:false,on:null};
+function setHum(want){
+  HUM.want=!!want; const should=HUM.want&&S.narr;
+  try{
+    if(should&&!HUM.on){ const a=AC(); if(a.state==='suspended') a.resume(); const g=a.createGain(); g.gain.value=0; g.gain.linearRampToValueAtTime(.022,a.currentTime+.3); g.connect(a.destination);
+      const os=[100,200,300].map((f,i)=>{ const o=a.createOscillator(); o.type=i?'sine':'triangle'; o.frequency.value=f; const gg=a.createGain(); gg.gain.value=[1,.5,.25][i]; o.connect(gg); gg.connect(g); o.start(); return o; }); HUM.on={g,os}; }
+    else if(!should&&HUM.on){ const h=HUM.on; HUM.on=null; const a=AC(); h.g.gain.cancelScheduledValues(a.currentTime); h.g.gain.setValueAtTime(h.g.gain.value,a.currentTime); h.g.gain.linearRampToValueAtTime(0,a.currentTime+.2); setTimeout(()=>h.os.forEach(o=>{ try{ o.stop(); }catch(e){} }),260); }
+  }catch(e){}
+}
+function toast(m){ const t=$id('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),2600); }
+
+/* ===== GIAO DIỆN CHUNG ===== */
+const SPK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9zM16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const sayBox=t=>`<span class="txt">${t}</span>`;
+const pill=(ico,t,act,o={})=>`<button class="pill1 ${o.cls||''}" type="button" data-act="${act}" ${o.i!=null?`data-i="${o.i}"`:''} ${o.k?`data-k="${o.k}"`:''} ${o.dis?'disabled':''}><i>${ico}</i>${esc(t)}</button>`;
+let lastKey='';
+/* vk: file giọng của thông báo (tự phát 1 lần, nút loa nghe lại); say: câu đọc bằng giọng trình duyệt (chỉ bước 1); không có cả hai → chỉ hiện chữ */
+function setBottom(info,pills,key,say,cls,vk,onEnd){
+  const k=S.stage+'|'+key+'|'+info; if(k===lastKey) return; lastKey=k;
+  const bi=$id('binfo'); bi.className='s1-info'+(cls?' '+cls:''); bi.innerHTML=sayBox(info); $id('bpills').innerHTML=pills;
+  if(!S.active){ S.lastSay=null; S.lastVk=null; return; }   /* chưa bấm «Bắt đầu thực hành» (màn mở đầu): không phát, không đánh dấu đã phát */
+  if(vk){ S.lastSay=null; S.lastVk=vk; if(!S.played[vk]){ S.played[vk]=true; speak(null,false,vk,onEnd); } }
+  else if(say){ speak(say,false,null,onEnd); }
+  else { S.lastSay=null; S.lastVk=null; }
+}
+
+
+/* =====================================================================
+   MÔ HÌNH 3D + CẢNH
+   ===================================================================== */
+const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
+/* ===== MÔ HÌNH 3D ===== */
+const MODELS={
+  bulb :'JII4MzTkeTIZkhcsxk', // Bóng đèn dây tóc
+  flask:'F3f_jEzfegy5D9IiJ2', // Bình thuỷ tinh (clone 2: phủ đen, tráng bạc)
+  stand:'cw3KOaXeupHt4b58uQ'  // Giá đỡ (clone 2)
+};
+/* URL: https://3d-cdn.yoolife.com.vn/${id}/${id}.glb */
+const SIZE={bulb:12,flask:18,stand:50};   /* chiều cao mục tiêu (cm) */
+const MD={};
+let modelsPromise=null;
+const glassM=(c=0xdff3fb,op=.28)=>new THREE.MeshPhysicalMaterial({color:c,transparent:true,opacity:op,roughness:.05,metalness:0,clearcoat:.3,clearcoatRoughness:.1,envMapIntensity:.55,side:THREE.DoubleSide,depthWrite:false});
+const stdM=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.5,metalness:.05},o));
+const liqM=(c,op)=>new THREE.MeshPhysicalMaterial({color:c,transparent:true,opacity:op,roughness:.08,clearcoat:.6,depthWrite:false});
+const addTo=(g,o,x=0,y=0,z=0)=>{ o.position.set(x,y,z); g.add(o); return o; };
+const lathe=(pts,m,seg=40)=>new THREE.Mesh(new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg),m);
+/* đo Box3 rồi scale đều về chiều cao mục tiêu; căn giữa x,z; đáy ở y=0 */
+function normModel(s,h){
+  s.updateMatrixWorld(true); const bb=new THREE.Box3().setFromObject(s), sz=bb.getSize(V3(0,0,0)); const k=sz.y>1e-6?h/sz.y:1; s.scale.multiplyScalar(k); s.updateMatrixWorld(true);
+  const b2=new THREE.Box3().setFromObject(s), c=b2.getCenter(V3(0,0,0)); s.position.set(s.position.x-c.x,s.position.y-b2.min.y,s.position.z-c.z);
+  const w=new THREE.Group(); w.add(s); w.updateMatrixWorld(true); return w;
+}
+/* hình dự phòng khi tải lỗi */
+function fallbackModel(k){
+  const g=new THREE.Group();
+  if(k==='bulb'){
+    const gl=new THREE.Mesh(new THREE.SphereGeometry(4.2,28,20),glassM(0xfff3d6,.35)); gl.name='glass'; gl.position.y=7.8; g.add(gl);
+    const bs=new THREE.Mesh(new THREE.CylinderGeometry(2,2.2,3.2,20),stdM(0x9aa3a8,{metalness:.7,roughness:.35})); bs.name='base'; bs.position.y=1.6; g.add(bs);
+  } else if(k==='flask'){
+    const pts=[[0,0]]; for(let a=-90;a<=70;a+=10){ const r=a*Math.PI/180; pts.push([6.5*Math.cos(r),6.5+6.5*Math.sin(r)]); } pts.push([1.7,12.6],[1.7,18]);
+    const f=lathe(pts,glassM(0xdff3fb,.3),36); f.name='flask_body'; g.add(f);
+  } else {
+    const b=new THREE.Mesh(new THREE.CylinderGeometry(11,12,1.6,32),stdM(0x2c3a40,{metalness:.4,roughness:.5})); b.name='base'; b.position.y=.8; g.add(b);
+    const p=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,50,16),stdM(0xc5ccd1,{metalness:.75,roughness:.3})); p.name='pole'; p.position.set(-6,25,0); g.add(p);
+  }
+  return g;
+}
+function loadModels(){
+  if(modelsPromise) return modelsPromise;
+  const GL=new GLTFLoader(); GL.setMeshoptDecoder(MeshoptDecoder);
+  modelsPromise=Promise.all(Object.keys(MODELS).map(k=>{
+    const url=`https://3d-cdn.yoolife.com.vn/${MODELS[k]}/${MODELS[k]}.glb`;
+    const tmo=new Promise((_,rej)=>setTimeout(()=>rej(new Error('quá thời gian chờ')),25000));
+    return Promise.race([GL.loadAsync(url),tmo]).then(g=>{
+      if(DEBUG){ const n=[]; g.scene.traverse(o=>{ if(o.isMesh) n.push(o.name+' ['+(o.material&&o.material.name)+']'); }); console.log('[GLB '+k+'] '+n.length+' mesh:',n.join(' | ')); }
+      MD[k]=normModel(g.scene,SIZE[k]);
+    }).catch(e=>{ console.warn('Không tải được mô hình',k,e); MD[k]=normModel(fallbackModel(k),SIZE[k]); });
+  }));
+  return modelsPromise;
+}
+function cloneModel(k){ const o=MD[k].clone(true); o.traverse(m=>{ if(m.isMesh&&m.material){ m.material=Array.isArray(m.material)?m.material.map(x=>x.clone()):m.material.clone(); } }); return o; }
+function blobTexture(){ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'), g=x.createRadialGradient(32,32,2,32,32,32); g.addColorStop(0,'rgba(0,0,0,.5)'); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=g; x.fillRect(0,0,64,64); return new THREE.CanvasTexture(c); }
+function glowTexture(r,g,b){ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'), gr=x.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,`rgba(${r},${g},${b},1)`); gr.addColorStop(.35,`rgba(${r},${g},${b},.45)`); gr.addColorStop(1,`rgba(${r},${g},${b},0)`); x.fillStyle=gr; x.fillRect(0,0,64,64); return new THREE.CanvasTexture(c); }
+/* vân gỗ tối */
+function woodTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=256; const x=c.getContext('2d'); x.fillStyle='#43352b'; x.fillRect(0,0,256,256);
+  for(let i=0;i<70;i++){ x.strokeStyle=`rgba(${i%2?'20,14,10':'110,88,70'},${(.1+Math.random()*.18).toFixed(2)})`; x.lineWidth=.6+Math.random()*2; const y=Math.random()*256; x.beginPath(); x.moveTo(0,y); x.bezierCurveTo(80,y+Math.random()*8-4,170,y+Math.random()*8-4,256,y+Math.random()*6-3); x.stroke(); }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(2,1); return t;
+}
+/* nhiễu nhẹ cho mặt phủ đen (xù xì) */
+function roughTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=128; const x=c.getContext('2d'), im=x.createImageData(128,128);
+  for(let i=0;i<im.data.length;i+=4){ const v=110+Math.random()*120; im.data[i]=im.data[i+1]=im.data[i+2]=v; im.data[i+3]=255; } x.putImageData(im,0,0);
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(5,5); return t;
+}
+
+/* ===== BỐ TRÍ (giống Hình 28.5: đèn bên trái, bình bên phải, cùng độ cao) ===== */
+const LAMP ={x:-6,  z:-4};          // đèn dây tóc trên đế gỗ, giữa bàn
+const FB   ={x:24,  z:-4};          // giá + bình PHỦ ĐEN (bên phải đèn, cách 30)
+const FS   ={x:-36, z:-4};          // giá + bình TRÁNG BẠC (bên trái đèn, cách 30) — chỉ hiện từ bước 4 phần 2
+const BOARD_AT={x:9, z:-4};         // vị trí đặt tấm gỗ: chính giữa đèn và bình đen
+let H_C = 22;                       // độ cao tâm bóng đèn = tâm bầu hai bình (đo từ kẹp của giá đỡ khi dựng cảnh)
+let FLASK_H = 18;
+const TRAY={x:62,z:-4,w:40,d:26};   /* khay cùng hàng với đèn và hai giá, đặt bên phải */
+const BOARD_H=22, BOARD_W=24, BOARD_T=2.5;   /* tấm gỗ 22 × 24 × 2,5 trên chân đế chữ T; tâm tấm gỗ cùng độ cao tâm bóng đèn */
+let BOARD_Y0=11.2;
+const T_AIR=25, T_EQ_B=45, T_EQ_S=31;
+
+/* ----- trạng thái cảnh 3D ----- */
+const B3={ok:false,ready:false,tws:[],dt:.016,yaw:0,pitch:.14,zoom:1,tx:-8,ty:24,tz:0,gw:120,gh:62,W:1,H:1,top:0,bot:0,right:0,showLbl:true,userTouched:false,hintT:0,dim:1,camKey:'all',moved:false,thermal:0,thermalWant:0,lamp:0,lampOn:false,fx:{air:0,rise:0,airW:0,riseW:0}};
+const GOAL={
+  all :{t:()=>[22,H_C+6,-4],w:142,h:56,pitch:.15},
+  rig :{t:()=>[24,H_C+6,-4],w:114,h:52,pitch:.12},
+  wide:{t:()=>[18,H_C+6,-4],w:134,h:52,pitch:.12},
+  cmp :{t:()=>[-6,H_C+16,-4],w:92,h:46,pitch:.1}
+};
+const tw3=(ms,fn)=>new Promise(res=>B3.tws.push({t0:null,ms,fn,res}));
+const wait3=ms=>tw3(ms,()=>{});
+const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+const moveTo=(o,pos,quat,ms,arc)=>{ const p0=o.position.clone(), q0=o.quaternion.clone(); return tw3(ms,p=>{ o.position.lerpVectors(p0,pos,p); if(arc) o.position.y+=Math.sin(p*Math.PI)*arc; if(quat) o.quaternion.slerpQuaternions(q0,quat,p); }); };
+const QUP=new THREE.Quaternion();                                                /* thẳng đứng */
+const qLie=(rz)=>new THREE.Quaternion().setFromEuler(new THREE.Euler(0,0,rz));
+
+/* đỉnh của mô hình trong toạ độ của nhóm cha */
+function eachVertex(root,fn){
+  root.updateMatrixWorld(true); const v=V3(0,0,0);
+  root.traverse(o=>{ if(!o.isMesh||!o.visible||!o.geometry||!o.geometry.attributes.position) return; const P=o.geometry.attributes.position;
+    for(let i=0;i<P.count;i++){ v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld); fn(v,o); } });
+}
+/* bình thuỷ tinh: gốc nhóm = tâm bầu bình; nhiệt kế cắm qua nút, bầu thuỷ ngân ở tâm bầu */
+function makeFlask(kind,targetH){
+  const G=new THREE.Group(), m=cloneModel('flask'); G.add(m); if(targetH) m.scale.multiplyScalar(clamp(targetH/SIZE.flask,.7,1.4));
+  m.traverse(o=>{ if(o.isMesh&&/liquid|fluid/i.test((o.name||'')+' '+((o.material&&o.material.name)||''))) o.visible=false; });
+  m.updateMatrixWorld(true);
+  const bb=new THREE.Box3().setFromObject(m), sz=bb.getSize(V3(0,0,0)), cx=(bb.min.x+bb.max.x)/2, cz=(bb.min.z+bb.max.z)/2;
+  const r=Math.min(Math.max(sz.x,sz.z)/2,sz.y*.45), bc=V3(cx,bb.min.y+r,cz);
+  m.position.set(-bc.x,-bc.y,-bc.z); G.updateMatrixWorld(true);
+  const mouthY=bb.max.y-bc.y;
+  const mat=kind==='black'
+    ? new THREE.MeshStandardMaterial({color:0x1c1c1c,roughness:.92,metalness:0,bumpMap:roughTexture(),bumpScale:1.4,emissive:0xff5a1a,emissiveIntensity:0})
+    : new THREE.MeshStandardMaterial({color:0xe3e8ec,roughness:.08,metalness:1,envMapIntensity:3.2,emissive:0xff5a1a,emissiveIntensity:0});
+  let stopper=null;
+  m.traverse(o=>{ if(!o.isMesh) return; const nm=(o.name||'')+' '+((o.material&&o.material.name)||'');
+    if(/stopper|cork|cap|plug|nut|lid/i.test(nm)){ stopper=o; o.material=stdM(0x3a3a3a,{roughness:.85}); } else { o.material=mat; o.renderOrder=0; } });
+  /* bán kính cổ bình (các đỉnh cách miệng ≤ 1,2 cm) */
+  let rn=0; eachVertex(m,v=>{ if(v.y>mouthY-1.2){ rn=Math.max(rn,Math.hypot(v.x,v.z)); } }); rn=clamp(rn||1.7,1.1,3.2);
+  if(!stopper){ const st=new THREE.Mesh(new THREE.CylinderGeometry(rn*1.3,rn*.9,2.4,24),stdM(0x3a3a3a,{roughness:.85})); st.position.set(0,mouthY-.3,0); G.add(st); }
+  /* nhiệt kế */
+  const TH=new THREE.Group(); G.add(TH);
+  const plate=addTo(TH,new THREE.Mesh(new THREE.BoxGeometry(2.4,22-mouthY-.4,.12),stdM(0xf4f6f2,{roughness:.6})),0,(22+mouthY+.4)/2,-.55);
+  const yTop=T=>lerp(mouthY+2,21,clamp((T-20)/30,0,1));
+  for(let T=20;T<=50;T+=5){ const tk=addTo(TH,new THREE.Mesh(new THREE.BoxGeometry(T%10?1.0:1.6,.1,.14),stdM(0x333333,{roughness:.6})),0,yTop(T),-.45); tk.position.x=T%10?-.7:-.4; }
+  addTo(TH,new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,22,14),glassM(0xffffff,.35)),0,11,0).renderOrder=7;
+  addTo(TH,new THREE.Mesh(new THREE.SphereGeometry(.72,14,10),stdM(0xd9342b,{roughness:.3,emissive:0x550000})),0,0,0);
+  const colG=new THREE.CylinderGeometry(.15,.15,1,10); colG.translate(0,.5,0);
+  const col=addTo(TH,new THREE.Mesh(colG,stdM(0xd9342b,{roughness:.3,emissive:0x660000})),0,0,0); col.renderOrder=8;
+  const setT=T=>{ col.scale.y=Math.max(.3,yTop(T)); };
+  setT(T_AIR);
+  G.userData={kind,r,mouthY,rn,mat,TH,setT,yTop,neckY:mouthY-3.2};
+  return G;
+}
+/* giá đỡ: mô hình đã có kẹp + một bình mẫu → ẩn bình mẫu (thuỷ tinh, chất lỏng), lấy vị trí bình mẫu làm chuẩn:
+   tâm bầu bình = tâm bình thật; nếu mô hình không có bình mẫu (hình dự phòng) thì dựng kẹp bằng code */
+function standInfo(m){
+  let sg=null; m.traverse(o=>{ if(!o.isMesh) return; const nm=(o.name||'')+' '+((o.material&&o.material.name)||''); if(/flask_glass/i.test(nm)) sg=o; if(/flask|glass|liquid|fluid/i.test(nm)) o.visible=false; });
+  m.updateMatrixWorld(true);
+  let hMax=0; eachVertex(m,v=>{ hMax=Math.max(hMax,v.y); }); let sx=0,sz=0,n=0; eachVertex(m,v=>{ if(v.y>hMax*.45){ sx+=v.x; sz+=v.z; n++; } });
+  const pole={x:n?sx/n:0,z:n?sz/n:0};
+  if(sg){ const bb=new THREE.Box3().setFromObject(sg), s=bb.getSize(V3(0,0,0)); return {own:true,cx:(bb.min.x+bb.max.x)/2,cz:(bb.min.z+bb.max.z)/2,minY:bb.min.y,h:s.y,r:Math.min(Math.max(s.x,s.z)/2,s.y*.45),pole}; }
+  return {own:false,cx:pole.x+8,cz:pole.z,minY:4,h:18,r:6.5,pole};
+}
+function makeStand(fx,fz){
+  const G=new THREE.Group(), m=cloneModel('stand'); G.add(m);
+  const info=standInfo(m); G.position.set(fx-info.cx,0,fz-info.cz);
+  if(!info.own){   /* kẹp dựng bằng code: cần ngang từ cột tới vòng kẹp quanh cổ bình */
+    const metal=stdM(0xc5ccd1,{metalness:.75,roughness:.28}), ny=info.minY+info.h-4, rr=2.1;
+    addTo(G,new THREE.Mesh(new THREE.BoxGeometry(2.2,2.2,2.2),metal),info.pole.x,ny,info.pole.z);
+    const len=Math.abs(info.cx-rr-info.pole.x); const arm=addTo(G,new THREE.Mesh(new THREE.CylinderGeometry(.32,.32,len,10),metal),(info.pole.x+info.cx-rr)/2,ny,info.cz); arm.rotation.z=Math.PI/2;
+    const ring=addTo(G,new THREE.Mesh(new THREE.TorusGeometry(rr,.3,10,32),metal),info.cx,ny,info.cz); ring.rotation.x=Math.PI/2;
+  }
+  G.userData={info,pole:V3(fx-info.cx+info.pole.x,0,fz-info.cz+info.pole.z)};
+  return G;
+}
+/* tấm gỗ dày trên chân đế chữ T: gốc nhóm = giữa chân đế trên mặt bàn; mặt tấm vuông góc đường nối đèn – bình (pháp tuyến theo trục x) */
+function makeBoard(){
+  const G=new THREE.Group(), wm=stdM(0xffffff,{map:woodTexture(),roughness:.6,emissive:0xffc933,emissiveIntensity:0});
+  const slab=addTo(G,new THREE.Mesh(new THREE.BoxGeometry(BOARD_T,BOARD_H,BOARD_W),wm),0,BOARD_Y0+BOARD_H/2,0);
+  const wm2=wm.clone(); wm2.map=wm.map; const ph=Math.max(.3,BOARD_Y0-1.2);
+  addTo(G,new THREE.Mesh(new THREE.BoxGeometry(2,ph+.4,3),wm2),0,1.2+ph/2-.2,0);
+  addTo(G,new THREE.Mesh(new THREE.BoxGeometry(9,1.2,14),wm2),0,.6,0);
+  G.userData={slab,mats:[wm,wm2]};
+  return G;
+}
+
+function buildScene3D(){
+  const sc=B3.sc, M=stdM, shTex=blobTexture();
+  /* đo kẹp của giá đỡ: tâm bầu bình thật = độ cao tâm bóng đèn = tâm tấm gỗ (H_C) */
+  { const si=standInfo(cloneModel('stand')); H_C=si.minY+si.r; FLASK_H=si.h; BOARD_Y0=Math.max(2,H_C-BOARD_H/2); _cB.set(FB.x,H_C,FB.z); _cS.set(FS.x,H_C,FS.z); if(DEBUG) console.log('[Đo] H_C =',H_C.toFixed(2),'cao bình mẫu =',FLASK_H.toFixed(2),'bầu bình r =',si.r.toFixed(2)); }
+  const blob=(x,z,r,o=1)=>{ const m=new THREE.Mesh(new THREE.PlaneGeometry(r*2,r*2),new THREE.MeshBasicMaterial({map:shTex,transparent:true,opacity:o,depthWrite:false})); m.rotation.x=-Math.PI/2; m.position.set(x,.04,z); m.renderOrder=1; sc.add(m); return m; };
+  /* bàn thí nghiệm */
+  addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(222,5,170),M(0xeef2ea,{roughness:.75})),-8,-2.5,0);
+  addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(222,5.2,.8),M(0xaebfb2,{roughness:.6})),-8,-2.6,85.1);
+  addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(222,.12,.5),M(0xffffff,{roughness:.4})),-8,.04,84.2);
+  /* khay gỗ phía trước bàn */
+  const mkTray=(tx,tz,tw,td)=>{ const tm=M(0xffffff,{map:woodTexture(),roughness:.6}), rm=M(0x9a8a7e,{map:woodTexture(),roughness:.6});
+    addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(tw,.2,td),tm),tx,.1,tz);
+    addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(tw+.8,1.2,.8),rm),tx,.6,tz-td/2); addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(tw+.8,1.2,.8),rm),tx,.6,tz+td/2);
+    addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(.8,1.2,td),rm),tx-tw/2,.6,tz); addTo(sc,new THREE.Mesh(new THREE.BoxGeometry(.8,1.2,td),rm),tx+tw/2,.6,tz); };
+  mkTray(TRAY.x,TRAY.z,TRAY.w,TRAY.d);
+
+  /* ===== đèn điện dây tóc trên đế gỗ (công tắc ở mặt trước đế) ===== */
+  const lg=B3.lampG=new THREE.Group(); lg.position.set(LAMP.x,0,LAMP.z); sc.add(lg);
+  const metal=M(0xc5ccd1,{metalness:.75,roughness:.28}), dark=M(0x2c3a40,{metalness:.35,roughness:.45});
+  const bm=cloneModel('bulb'), parts={fil:[],glass:[],base:[]};
+  bm.traverse(o=>{ if(!o.isMesh) return; const nm=(o.name||'')+' '+((o.material&&o.material.name)||'');
+    if(/filament|wire|coil|day/i.test(nm)) parts.fil.push(o); else if(/base|socket|cap|duoi/i.test(nm)) parts.base.push(o); else if(/glass|bulb|bong/i.test(nm)) parts.glass.push(o); });
+  if(DEBUG) console.log('[Bóng đèn] dây tóc:',parts.fil.map(o=>o.name),'thuỷ tinh:',parts.glass.map(o=>o.name),'đui:',parts.base.map(o=>o.name));
+  bm.updateMatrixWorld(true);
+  let gc=SIZE.bulb*.62; if(parts.glass.length){ const gb=new THREE.Box3(); parts.glass.forEach(o=>gb.expandByObject(o)); const c=gb.getCenter(V3(0,0,0)); if(c.y>SIZE.bulb*.35&&c.y<SIZE.bulb*.9) gc=c.y; }
+  let by=H_C-gc;                                                 /* tâm bóng đèn ở độ cao H_C */
+  const hb=clamp(by,2.4,6);                                      /* đế gỗ 10 × hb × 8 (hb = 6 khi đủ chỗ) */
+  addTo(lg,new THREE.Mesh(new THREE.BoxGeometry(10,hb,8),M(0xffffff,{map:woodTexture(),roughness:.6})),0,hb/2,0);
+  by=Math.max(by,hb-.2);
+  const post=Math.max(0,by-hb+.6);
+  if(post>.2) addTo(lg,new THREE.Mesh(new THREE.CylinderGeometry(.85,1.1,post,16),metal),0,hb+post/2,0);
+  addTo(lg,bm,0,by,0);
+  const fmat=[], gmat=[];
+  parts.fil.forEach(o=>{ const mt=o.material; if(mt.emissive){ mt.emissive.setHex(0xffb347); mt.emissiveIntensity=0; fmat.push(mt); } });
+  parts.glass.forEach(o=>{ const mt=o.material; if(mt.emissive){ mt.emissive.setHex(0xfff1c9); mt.emissiveIntensity=0; gmat.push(mt); } });
+  if(!parts.fil.length){   /* tự dựng dây tóc xoắn */
+    const pts=[]; for(let i=0;i<=90;i++){ const t=i/90, a=t*Math.PI*2*7; pts.push(V3(-1.3+t*2.6,Math.sin(a)*.42,Math.cos(a)*.42)); }
+    const fm=new THREE.MeshStandardMaterial({color:0x8a6a3a,emissive:0xffb347,emissiveIntensity:0,roughness:.4,metalness:.6});
+    const fil=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),160,.07,6),fm); fil.position.set(0,gc,0); fil.rotation.z=Math.PI/2; fil.rotation.y=0; bm.add(fil); fmat.push(fm);
+  }
+  B3.bulbMats={fmat,gmat};
+  const bl=B3.bulbLight=new THREE.PointLight(0xffd59a,0,120,1.5); bl.position.set(0,H_C,0); lg.add(bl);
+  const glow=B3.bulbGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTexture(255,214,140),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false})); glow.scale.set(26,26,1); glow.position.set(0,H_C,0); glow.renderOrder=10; lg.add(glow);
+  blob(LAMP.x,LAMP.z,9,.7);
+  /* công tắc (mặt trước đế đèn) */
+  { const sw=B3.sw=new THREE.Group(); sw.position.set(LAMP.x+2.4,hb*.5,LAMP.z+4.05); sw.rotation.x=Math.PI/2; sw.scale.setScalar(.8); sc.add(sw);
+    addTo(sw,new THREE.Mesh(new THREE.CylinderGeometry(2.1,2.3,.6,24),M(0x1d272c,{roughness:.4,metalness:.4})),0,.3,0);
+    B3.swRing=addTo(sw,new THREE.Mesh(new THREE.TorusGeometry(1.7,.22,8,24),new THREE.MeshStandardMaterial({color:0x8a9a9a,emissive:0x000000,roughness:.4})),0,.65,0); B3.swRing.rotation.x=Math.PI/2;
+    B3.swBtn=addTo(sw,new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.3,1,24),M(0xd9302f,{roughness:.35,metalness:.1,emissive:0xffc933,emissiveIntensity:0})),0,1.15,0); }
+
+  /* ===== hai bình thuỷ tinh + hai giá đỡ ===== */
+  const fb=B3.flaskB=makeFlask('black',FLASK_H); fb.position.set(FB.x,H_C,FB.z); sc.add(fb);
+  B3.standB=makeStand(FB.x,FB.z); sc.add(B3.standB); blob(FB.x,FB.z-8,13,.8);
+  const fs=B3.flaskS=makeFlask('silver',FLASK_H); sc.add(fs);
+  B3.standS=makeStand(FS.x,FS.z); sc.add(B3.standS); blob(FS.x,FS.z-8,13,.8);
+  /* đế vòng nhỏ kê bình tráng bạc trên khay */
+  B3.ringS=new THREE.Mesh(new THREE.TorusGeometry(3.4,.55,10,28),M(0x9a8a7e,{roughness:.6})); B3.ringS.rotation.x=Math.PI/2; sc.add(B3.ringS);
+  B3.flaskPos={x:TRAY.x+9,z:TRAY.z-4};
+  /* ===== tấm gỗ ===== */
+  B3.board=makeBoard(); sc.add(B3.board);
+  { const g=B3.ghost=new THREE.Group(); const gm=new THREE.MeshBasicMaterial({color:0xc9a06a,transparent:true,opacity:.25,depthWrite:false});
+    const box=new THREE.Mesh(new THREE.BoxGeometry(BOARD_T,BOARD_H,BOARD_W),gm); box.position.y=BOARD_Y0+BOARD_H/2; g.add(box);
+    const ed=new THREE.LineSegments(new THREE.EdgesGeometry(box.geometry),new THREE.LineDashedMaterial({color:0xffe27a,dashSize:1.2,gapSize:.8})); ed.computeLineDistances(); ed.position.copy(box.position); g.add(ed);
+    g.position.set(BOARD_AT.x,0,BOARD_AT.z); g.visible=false; box.renderOrder=3; sc.add(g); }
+  /* ===== ánh sáng ===== */
+  B3.lights=[new THREE.HemisphereLight(0xffffff,0x3a5a60,.9),new THREE.DirectionalLight(0xffffff,1.7),new THREE.DirectionalLight(0xbfe9ff,.6)];
+  B3.lights[1].position.set(-30,60,50); B3.lights[2].position.set(40,20,-30); B3.lights.forEach(l=>{ l.userData.i0=l.intensity; sc.add(l); });
+  buildFx();
+  resetVisuals(); makeProxies(); B3.ready=true;
+}
+/* ----- tia nhiệt + hạt khí: dùng pool cố định ----- */
+const NRAY=24;
+const RAYDIR=[[0,0],[8,0],[-8,0],[0,10],[0,-10],[180,0],[172,0],[188,0],[180,10],[180,-10],[30,0],[-30,0],[150,0],[-150,0],[60,0],[-60,0],[120,0],[-120,0],[90,0],[-90,0],[90,20],[-90,20],[90,-20],[-90,-20]];
+function buildFx(){
+  const sc=B3.sc, small=innerWidth<760, nr=small?16:NRAY, tex=glowTexture(255,255,255);
+  B3.nray=nr;
+  const rg=B3.rays=new THREE.Group(); rg.visible=false; sc.add(rg);
+  const cg=new THREE.CylinderGeometry(.12,.12,1,6), cm=new THREE.MeshBasicMaterial({color:0xff6a2b,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false});
+  const rm=new THREE.MeshBasicMaterial({color:0xffc79a,transparent:true,opacity:.4,blending:THREE.AdditiveBlending,depthWrite:false});
+  B3.rayM=cm; B3.refM=rm; B3.rl=[];
+  for(let i=0;i<nr;i++){
+    const m=new THREE.Mesh(cg,cm); m.renderOrder=11; rg.add(m);
+    const rf=new THREE.Mesh(cg,rm); rf.renderOrder=11; rf.visible=false; rg.add(rf);
+    const pu=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0xffb070,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false})); pu.scale.set(2.2,2.2,1); pu.renderOrder=12; rg.add(pu);
+    const ht=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0xffe0a0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false})); ht.scale.set(5,5,1); ht.renderOrder=12; rg.add(ht);
+    const d=RAYDIR[i%RAYDIR.length], az=d[0]*Math.PI/180, el=d[1]*Math.PI/180;
+    B3.rl.push({m,rf,pu,ht,dir:V3(Math.cos(el)*Math.cos(az),Math.sin(el),Math.cos(el)*Math.sin(az)*-1),len:60,hit:0,P:V3(0,0,0),N:V3(0,1,0),off:i*.137});
+  }
+  /* hạt không khí thưa thớt (dẫn nhiệt) và luồng khí nóng đi lên (đối lưu) */
+  const na=small?20:40, nu=small?30:60, r=rng(11);
+  B3.air=[]; const ag=new THREE.Group(); ag.visible=false; sc.add(ag); B3.airG=ag;
+  for(let i=0;i<na;i++){ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0x9fd8ff,transparent:true,opacity:.7,depthWrite:false})); s.scale.set(1.2,1.2,1); ag.add(s); B3.air.push({s,x:lerp(LAMP.x+7,FB.x-8,r()),y:H_C+(r()-.5)*16,z:FB.z+(r()-.5)*12,a:r()*6.28,b:r()*6.28,sp:.6+r()}); }
+  B3.rise=[]; const ug=new THREE.Group(); ug.visible=false; sc.add(ug); B3.riseG=ug;
+  for(let i=0;i<nu;i++){ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,color:0xff9a4a,transparent:true,opacity:0,depthWrite:false})); ug.add(s); B3.rise.push({s,h:r(),a:r()*6.28,sp:.14+r()*.16,rr:r()}); }
+}
+
+
+/* =====================================================================
+   TRẠNG THÁI, MÔ HÌNH NHIỆT ĐỘ, ĐỒ THỊ, VÙNG BẤM, KÉO THẢ, NHÃN, VÒNG LẶP 3D
+   ===================================================================== */
+/* ===== MÔ HÌNH NHIỆT ĐỘ ===== */
+const SIM={t:0,TB:T_AIR,TS:T_AIR,boardIn:false,silverOn:false,cool:null,hist:[],nextH:0};
+const E={done:0,phase:'on',sub:'start',busy:false,tBoard:0,peak:25,tMin:25,note:null};      /* bước 3: thí nghiệm */
+const R={done:0,phase:'check',cards:{dn:0,dl:0,tn:0},last:null,busy:false,silverIn:false,goDone:false,timers:[],compared:false};   /* bước 4: tia nhiệt */
+const fmtT=v=>v.toFixed(1).replace('.',',');
+const boardUp=()=>B3.board.position.distanceTo(V3(BOARD_AT.x,0,BOARD_AT.z))<3;
+function simStep(dt){
+  const d=dt*S.speed; SIM.t+=d;
+  if(SIM.cool){ const c=SIM.cool; c.e+=dt; const p=clamp(c.e/c.dur,0,1), e=ease(p); SIM.TB=lerp(c.b0,T_AIR,e); SIM.TS=lerp(c.s0,T_AIR,e); if(p>=1){ SIM.cool=null; if(c.done) c.done(); } }
+  else {
+    const on=B3.lampOn, eqB=on&&!SIM.boardIn?T_EQ_B:T_AIR;
+    SIM.TB+=(eqB-SIM.TB)*(1-Math.exp(-d/(eqB>SIM.TB?10:12)));
+    if(SIM.silverOn){ const eqS=on?T_EQ_S:T_AIR; SIM.TS+=(eqS-SIM.TS)*(1-Math.exp(-d/(eqS>SIM.TS?10:12))); }
+  }
+  if(SIM.t>=SIM.nextH){ SIM.nextH=SIM.t+.25; SIM.hist.push({t:SIM.t,b:SIM.TB,s:SIM.silverOn?SIM.TS:null,w:SIM.boardIn?1:0}); if(SIM.hist.length>2800) SIM.hist.splice(0,400); }
+}
+function resetSim(){ SIM.t=0; SIM.TB=SIM.TS=T_AIR; SIM.boardIn=false; SIM.cool=null; SIM.hist.length=0; SIM.nextH=0; SIM.silverOn=false; S.speed=1; }
+
+/* ===== ĐỒ THỊ NHIỆT ĐỘ ===== */
+let _gT=0;
+function drawGraph(now){
+  const gp=$id('graph3'); if(!gp||gp.hidden||now-_gT<120) return; _gT=now;
+  const cv=$id('gcv'), x=cv.getContext('2d'), W=220, H=110; x.setTransform(cv.width/W,0,0,cv.height/H,0,0); x.clearRect(0,0,W,H);
+  const L=30, Rr=W-8, Tp=18, Bt=H-16, t1=Math.max(60,SIM.t), t0=t1-60, X=t=>L+(t-t0)/60*(Rr-L), Y=v=>Bt-(clamp(v,20,50)-20)/30*(Bt-Tp);
+  x.fillStyle='#fff'; x.fillRect(0,0,W,H);
+  x.fillStyle='#16423c'; x.font='700 9.5px Roboto,Arial'; x.textAlign='left'; x.fillText('Nhiệt độ (°C) – thời gian (s)',6,11);
+  /* vùng có tấm gỗ chắn */
+  x.fillStyle='rgba(160,110,60,.25)'; let st=null;
+  for(const h of SIM.hist){ if(h.t<t0-1) continue; if(h.w&&st===null) st=h.t; if(!h.w&&st!==null){ x.fillRect(X(Math.max(st,t0)),Tp,X(h.t)-X(Math.max(st,t0)),Bt-Tp); st=null; } }
+  if(st!==null){ x.fillRect(X(Math.max(st,t0)),Tp,X(t1)-X(Math.max(st,t0)),Bt-Tp); }
+  /* lưới + nhãn trục */
+  x.strokeStyle='#e1ebe8'; x.lineWidth=1; x.fillStyle='#68817a'; x.font='600 8.5px Roboto,Arial'; x.textAlign='right';
+  [25,35,45].forEach(v=>{ x.beginPath(); x.moveTo(L,Y(v)); x.lineTo(Rr,Y(v)); x.stroke(); x.fillText(v,L-3,Y(v)+3); });
+  x.textAlign='center'; for(let s=0;s<=60;s+=20){ const tt=Math.round(t0+s); x.fillText(tt,X(t0+s),H-5); }
+  x.strokeStyle='#9fb3ad'; x.beginPath(); x.moveTo(L,Tp); x.lineTo(L,Bt); x.lineTo(Rr,Bt); x.stroke();
+  const line=(key,col,w)=>{ x.strokeStyle=col; x.lineWidth=w; x.beginPath(); let m=false; for(const h of SIM.hist){ const v=h[key]; if(v==null||h.t<t0-.3){ m=false; continue; } const px=X(h.t), py=Y(v); if(m) x.lineTo(px,py); else { x.moveTo(px,py); m=true; } } x.stroke(); };
+  line('b','#1d1d1d',2); if(SIM.silverOn) line('s','#9aa7b0',2.4);
+  if(SIM.silverOn){ x.textAlign='right'; x.fillStyle='#1d1d1d'; x.fillText('● đen',Rr-30,11); x.fillStyle='#8a98a1'; x.fillText('● bạc',Rr,11); }
+}
+
+/* ===== VÙNG BẤM ===== */
+function pickDefs(){ return {flaskB:[B3.flaskB],flaskS:[B3.flaskS],bulb:[B3.lampG],board:[B3.board],stand:[B3.standB,B3.standS],switch:[B3.sw]}; }
+function addProxyLocal(g,key,c,s){ const px=new THREE.Mesh(new THREE.BoxGeometry(s.x,s.y,s.z),new THREE.MeshBasicMaterial()); px.position.copy(c); px.visible=false; px.userData.key=key; px.userData.proxy=true; g.add(px); }
+function makeProxies(){
+  [B3.flaskB,B3.flaskS].forEach(f=>{ const u=f.userData, k=u.kind==='black'?'flaskB':'flaskS'; addProxyLocal(f,k,V3(0,(u.mouthY-u.r)/2,0),V3(u.r*2.1,u.mouthY+u.r+1.5,u.r*2.1)); });
+  addProxyLocal(B3.lampG,'bulb',V3(0,(H_C+6)/2,0),V3(10,H_C+6,8));
+  addProxyLocal(B3.board,'board',V3(0,BOARD_Y0+BOARD_H/2,0),V3(BOARD_T+1.6,BOARD_H,BOARD_W));
+  addProxyLocal(B3.board,'board',V3(0,(BOARD_Y0)/2,0),V3(9,BOARD_Y0,14));
+  [B3.standB,B3.standS].forEach(g=>{ g.updateMatrixWorld(true); const bb=new THREE.Box3().setFromObject(g); const inv=g.matrixWorld.clone().invert(), lb=bb.clone().applyMatrix4(inv), sz=lb.getSize(V3(0,0,0)), ce=lb.getCenter(V3(0,0,0)); addProxyLocal(g,'stand',ce,sz); });
+  { B3.sw.updateMatrixWorld(true); const wb=new THREE.Box3().setFromObject(B3.sw).expandByScalar(1.6); addProxy(B3.sw,'switch',wb); }
+  B3.rc=new THREE.Raycaster(); collectPicks();
+}
+function addProxy(g,key,box,mul){ g.updateMatrixWorld(true); const inv=g.matrixWorld.clone().invert(), lb=box.clone().applyMatrix4(inv), sz=lb.getSize(V3(0,0,0)).multiplyScalar(mul||1.08), ce=lb.getCenter(V3(0,0,0)); addProxyLocal(g,key,ce,V3(Math.max(sz.x,.001),Math.max(sz.y,.001),Math.max(sz.z,.001))); }
+function collectPicks(){
+  if(!B3.rc) return; B3.pickMeshes=[]; const d=pickDefs();
+  for(const key in d){ d[key].forEach(g=>{ if(!g) return; g.traverse(m=>{ if(!m.isMesh) return; if(m.userData.proxy&&m.userData.key!==key) return; m.userData.key=key; B3.pickMeshes.push(m); }); }); }
+}
+const _vis=m=>{ let o=m.userData.proxy?m.parent:m; while(o){ if(o.visible===false) return false; o=o.parent; } return true; };
+function ndc(e){ const r=B3.cv.getBoundingClientRect(); B3.rc.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1),B3.cam); }
+function pickAt(e){ ndc(e); const h=B3.rc.intersectObjects(B3.pickMeshes.filter(_vis),false); return h.length?h[0].object.userData.key:null; }
+function pickAll(e){ ndc(e); return B3.rc.intersectObjects(B3.pickMeshes.filter(_vis),false).map(h=>h.object.userData.key); }
+function bindPick(cv){
+  let down=null;
+  cv.addEventListener('pointerdown',e=>{ down={x:e.clientX,y:e.clientY}; });
+  cv.addEventListener('pointerup',e=>{ if(!down||e.button!==0||e.shiftKey){ down=null; return; } const m=Math.hypot(e.clientX-down.x,e.clientY-down.y); down=null; if(m>6) return; const k=pickAt(e); if(k) onPick(k); else if(S.stage===0&&B3.zoomId) zoomOut(); });
+  let hv=0; cv.addEventListener('pointermove',e=>{ if(e.buttons) return; const t=performance.now(); if(t-hv<90) return; hv=t; const sp=dragSpec(); if(sp){ cv.style.cursor=pickAll(e).includes(sp.src)?'grab':'move'; return; } const k=pickAt(e); cv.style.cursor=k?'pointer':'grab'; });
+}
+/* nhấp nháy vật cần thao tác (công tắc / tấm gỗ) */
+function curTarget(){
+  if(S.stage===2&&E.done<3&&!E.busy){ if(E.phase==='on'&&E.sub==='start') return 'switch'; if(E.sub==='start'&&(E.phase==='board'||E.phase==='remove')) return 'board'; }
+  if(S.stage===3&&!R.busy){ if(R.phase==='silver'&&!R.silverIn) return 'flaskS'; if(R.phase==='compare'&&!B3.lampOn&&R.done<3) return 'switch'; }
+  return null;
+}
+function glow3D(now){
+  const tg=curTarget(), pl=.3+.22*Math.sin(now*.006)+(now<B3.hintT?.5:0);
+  B3.swBtn.material.emissiveIntensity=tg==='switch'?pl+.4:0;
+  const heat=(B3.thermal>.02&&B3.lampOn&&boardUp())?B3.thermal*.28:0, bi=(tg==='board'?pl:0)+heat;
+  B3.board.userData.mats.forEach(m=>{ m.emissiveIntensity=bi; });
+}
+const boardCenter=()=>new THREE.Box3().setFromObject(B3.board.userData.slab).getCenter(V3(0,0,0));
+function handPoint(k){
+  switch(k){
+    case 'switch': { const p=V3(0,0,0); B3.sw.getWorldPosition(p); return p.add(V3(0,1.5,2)); }
+    case 'board': return boardCenter().add(V3(0,2,0));
+    case 'flaskS': return B3.flaskS.position.clone().add(V3(0,3,0));
+  } return V3(0,0,0);
+}
+/* nhãn có đánh số nối tới đúng vật (đúng thứ tự trong voice «dc») */
+const L3=[
+  {n:1,t:'Giá đỡ',get:()=>V3(B3.standS.userData.pole.x,34,B3.standS.userData.pole.z),dx:-44,dy:-40,id:'stand'},
+  {n:2,t:'Đèn điện dây tóc',get:()=>V3(LAMP.x,H_C+1,LAMP.z),dx:-52,dy:-30,id:'bulb'},
+  {n:3,t:'Bình thuỷ tinh phủ đen (có nhiệt kế)',get:()=>V3(FB.x,H_C+2,FB.z),dx:44,dy:-34,id:'flaskB'},
+  {n:4,t:'Tấm gỗ dày',get:()=>boardCenter(),dx:-30,dy:-52,id:'board'},
+  {n:5,t:'Bình thuỷ tinh tráng bạc',get:()=>B3.flaskS.position.clone().add(V3(0,3,0)),dx:30,dy:-46,id:'flaskS'}
+];
+const USE={
+  flaskB:'Mặt ngoài phủ đen; nhiệt kế bên trong cho biết nhiệt độ trong bình.',
+  flaskS:'Mặt ngoài tráng bạc sáng bóng; dùng để so sánh với bình phủ đen.',
+  bulb:'Khi bật, dây tóc nóng sáng và phát ra năng lượng. Bấm công tắc ở đế để bật / tắt.',
+  board:'Dùng để chắn giữa đèn và bình.',
+  stand:'Giữ bình thuỷ tinh ở cùng độ cao với bóng đèn.'
+};
+const KEYNAME={board:'tấm gỗ',flaskS:'bình tráng bạc',flaskB:'bình phủ đen',switch:'công tắc',boardSlot:'vòng vàng giữa đèn và bình',tray:'khay',clampS:'kẹp của giá bên trái đèn'};
+
+/* ===== KÉO THẢ ===== */
+const DRAG_LIFT={board:0,flaskS:0};
+const dragSpec=()=>{
+  if(!B3.ready||E.busy||R.busy) return null;
+  if(S.stage===2&&E.done<3&&E.sub==='start'){
+    if(E.phase==='board') return {src:'board',dst:'boardSlot',msg:'Hãy đặt tấm gỗ vào vòng vàng, giữa đèn và bình.'};
+    if(E.phase==='remove') return {src:'board',dst:'tray',ref:'boardSlot',any:true,msg:'Hãy kéo tấm gỗ ra khỏi vị trí chắn.'};
+  }
+  if(S.stage===3&&R.phase==='silver'&&!R.silverIn) return {src:'flaskS',dst:'clampS',msg:'Hãy đặt bình tráng bạc vào kẹp của giá bên trái đèn.'};
+  return null;
+};
+const dragObj=k=>({board:B3.board,flaskS:B3.flaskS})[k];
+function dstPoint(k){
+  switch(k){
+    case 'boardSlot': return V3(BOARD_AT.x,BOARD_Y0+BOARD_H/2,BOARD_AT.z);
+    case 'tray': return V3(TRAY.x,2,TRAY.z);
+    case 'clampS': return V3(FS.x,H_C,FS.z);
+  } return V3(0,0,0);
+}
+const toScreen=v=>{ const q=v.clone().project(B3.cam); return [(q.x*.5+.5)*B3.W,(-q.y*.5+.5)*B3.H]; };
+function bindDrag(cv){
+  let d=null; const plane=new THREE.Plane(V3(0,1,0),0), hit=V3(0,0,0);
+  cv.addEventListener('pointerdown',e=>{
+    const sp=dragSpec(); if(!sp||e.button!==0||e.shiftKey||!B3.ready||!pickAll(e).includes(sp.src)) return;
+    const o=dragObj(sp.src); if(!o) return;
+    plane.constant=-o.position.y; ndc(e); if(!B3.rc.ray.intersectPlane(plane,hit)) return;
+    d={sp,o,y0:o.position.y,p0:o.position.clone(),q0:o.quaternion.clone(),ox:o.position.x-hit.x,oz:o.position.z-hit.z};
+    try{ cv.setPointerCapture(e.pointerId); }catch(_){} e.stopImmediatePropagation(); B3.dragging=true; cv.style.cursor='grabbing'; beep(true);
+  },true);
+  cv.addEventListener('pointermove',e=>{ if(!d) return; e.stopImmediatePropagation(); ndc(e); if(B3.rc.ray.intersectPlane(plane,hit)) d.o.position.set(hit.x+d.ox,d.y0+DRAG_LIFT[d.sp.src],hit.z+d.oz); },true);
+  const end=e=>{ if(!d) return; e.stopImmediatePropagation(); const sp=d.sp, r=cv.getBoundingClientRect(), s=toScreen(dstPoint(sp.ref||sp.dst)), dist=Math.hypot(e.clientX-r.left-s[0],e.clientY-r.top-s[1]), R0=Math.max(60,B3.H*.11);
+    d.o.position.copy(d.p0); d.o.quaternion.copy(d.q0); d=null; B3.dragging=false; cv.style.cursor='grab'; try{ cv.releasePointerCapture(e.pointerId); }catch(_){}
+    const ok=sp.any?dist>R0*.6:dist<=R0;
+    if(ok){ B3.dropOK=true; onPick(sp.src); B3.dropOK=false; }
+    else{ beep(false); toast(sp.msg); } };
+  cv.addEventListener('pointerup',end,true); cv.addEventListener('pointercancel',end,true);
+}
+
+/* ===== ĐÈN, CÔNG TẮC, CAMERA TIA NHIỆT ===== */
+const setSwitch=on=>{ B3.swBtn.position.y=on?.75:1.15; B3.swRing.material.emissive.setHex(on?0x33ff77:0); B3.swRing.material.emissiveIntensity=on?1.4:0; };
+function setLamp(on,silent){ B3.lampOn=!!on; setSwitch(!!on); if(!silent) sfx('click'); setHum(!!on); }
+function setThermal(on,silent){ on=!!on; if(!silent&&(B3.thermalWant>.5)!==on) sfx('whoosh'); B3.thermalWant=on?1:0; syncCam(); }
+function syncCam(){
+  const on=B3.thermalWant>.5, avail=S.stage===3&&(R.cards.tn||R.phase!=='check');
+  const cb=$id('camBtn'), fc=$id('ftCam'); if(cb){ cb.hidden=!avail; cb.classList.toggle('on',on); cb.textContent=on?'📷 Tắt camera tia nhiệt':'📷 Camera tia nhiệt'; cb.setAttribute('aria-pressed',on); }
+  if(fc){ fc.hidden=!avail; fc.classList.toggle('on',on); }
+  const bd=$id('thermBadge'); if(bd) bd.hidden=!(on&&S.stage===3);
+  const ch=$id('chip3'); if(ch) ch.style.visibility=(on&&S.stage===3)?'hidden':'';
+}
+/* hạt khí / khí nóng / nhãn */
+const TAGS={
+  air :{get:()=>V3((LAMP.x+FB.x)/2,H_C+10,FB.z),c:'#8fd0ff'},
+  rise:{get:()=>V3(LAMP.x,H_C+32,LAMP.z),c:'#ff9a4a'},
+  cool:{get:()=>V3(-6,H_C+18,-4),c:'#8fd0ff'},
+  abs :{get:()=>V3(FB.x,H_C-9,FB.z+8),c:'#ff8a2a'},
+  ref :{get:()=>V3(FS.x,H_C-9,FS.z+8),c:'#9fd8ff'}
+};
+function showTag(id,text,ms){ const t=TAGS[id]; if(!t||!t.el) return; t.el.textContent=text; t.el.hidden=false; t.on=true; clearTimeout(t.tm); if(ms) t.tm=setTimeout(()=>hideTag(id),ms); }
+function hideTag(id){ const t=TAGS[id]; if(!t||!t.el) return; t.on=false; t.el.hidden=true; clearTimeout(t.tm); }
+function hideAllTags(){ Object.keys(TAGS).forEach(hideTag); }
+function fxStop(){ B3.fx.airW=0; B3.fx.riseW=0; hideTag('air'); hideTag('rise'); }
+
+/* ===== CAMERA TIA NHIỆT: tia thẳng, bị chắn / hấp thụ / phản xạ ===== */
+const _o=V3(0,0,0), _p=V3(0,0,0), _n=V3(0,0,0), _rf=V3(0,0,0), _Y=V3(0,1,0), _c=V3(0,0,0);
+function raySphere(o,d,c,r){ _c.copy(o).sub(c); const b=_c.dot(d), cc=_c.dot(_c)-r*r, h=b*b-cc; if(h<0) return -1; const t=-b-Math.sqrt(h); return t>0?t:-1; }
+function rayBox(o,d,mn,mx){ let t0=0,t1=1e9; for(const a of ['x','y','z']){ const inv=1/(d[a]||1e-9); let ta=(mn[a]-o[a])*inv, tb=(mx[a]-o[a])*inv; if(ta>tb){ const t=ta; ta=tb; tb=t; } t0=Math.max(t0,ta); t1=Math.min(t1,tb); if(t0>t1) return -1; } return t0>0?t0:-1; }
+const _bmn=V3(0,0,0), _bmx=V3(0,0,0), _cB=V3(FB.x,H_C,FB.z), _cS=V3(FS.x,H_C,FS.z);
+function updateRays(T){
+  const on=B3.lampOn&&B3.thermal>.02; B3.rays.visible=on; if(!on) return;
+  _o.set(LAMP.x,H_C,LAMP.z); const th=B3.thermal, up=boardUp(), bp=B3.board.position;
+  _bmn.set(bp.x-BOARD_T/2,bp.y+BOARD_Y0,bp.z-BOARD_W/2); _bmx.set(bp.x+BOARD_T/2,bp.y+BOARD_Y0+BOARD_H,bp.z+BOARD_W/2);
+  B3.rayM.opacity=.55*th; B3.refM.opacity=.45*th;
+  const rB=B3.flaskB.userData.r, rS=B3.flaskS.userData.r;
+  for(let i=0;i<B3.rl.length;i++){
+    const r=B3.rl[i], d=r.dir; let best=80, kind=0, t;
+    if(d.y<-1e-4){ t=-_o.y/d.y; if(t<best){ best=t; kind=4; } }
+    if(up){ t=rayBox(_o,d,_bmn,_bmx); if(t>0&&t<best){ best=t; kind=1; } }
+    t=raySphere(_o,d,_cB,rB); if(t>0&&t<best){ best=t; kind=2; }
+    if(SIM.silverOn){ t=raySphere(_o,d,_cS,rS); if(t>0&&t<best){ best=t; kind=3; } }
+    if(!r.q){ r.q=new THREE.Quaternion().setFromUnitVectors(_Y,d); r.m.quaternion.copy(r.q); }
+    r.len=best; r.hit=kind; _p.copy(_o).addScaledVector(d,best);
+    r.m.position.copy(_o).addScaledVector(d,best/2); r.m.scale.set(1,best,1);
+    const ph=(T/1.2+r.off)%1;
+    r.pu.position.copy(_o).addScaledVector(d,best*ph); r.pu.material.opacity=.95*Math.sin(ph*Math.PI)*th;
+    r.rf.visible=false; r.ht.material.opacity=0;
+    if(kind===2){ const f=ph<.25?1-ph/.25:0; r.ht.position.copy(_p); r.ht.material.opacity=.95*f*th; r.ht.scale.setScalar(3+3*f); }
+    else if(kind===1){ r.ht.position.copy(_p); r.ht.material.opacity=.35*th; r.ht.scale.setScalar(4); }
+    else if(kind===3){
+      _n.copy(_p).sub(_cS).normalize(); _rf.copy(d).addScaledVector(_n,-2*d.dot(_n)).normalize();
+      r.rf.visible=true; r.rf.position.copy(_p).addScaledVector(_rf,6); r.rf.scale.set(1,12,1); r.rf.quaternion.setFromUnitVectors(_Y,_rf);
+      const f=ph<.25?1-ph/.25:0; r.ht.position.copy(_p); r.ht.material.opacity=.5*f*th; r.ht.scale.setScalar(3);
+    }
+  }
+}
+
+/* ===== TRẠNG THÁI HÌNH ẢNH BAN ĐẦU ===== */
+function boardToTray(){ const b=B3.board; b.quaternion.copy(QUP); b.position.set(TRAY.x-10,.2,TRAY.z); b.updateMatrixWorld(true); B3.boardRest={p:b.position.clone(),q:b.quaternion.clone()}; }
+function flaskToTray(){ const f=B3.flaskS, r=f.userData.r; f.quaternion.setFromEuler(new THREE.Euler(Math.PI/2,0,0)); f.position.set(B3.flaskPos.x,r+1.05,B3.flaskPos.z); f.userData.TH.visible=false; B3.ringS.position.set(B3.flaskPos.x,.9,B3.flaskPos.z); B3.ringS.visible=true; SIM.silverOn=false; R.silverIn=false; }
+function flaskToClamp(){ const f=B3.flaskS; f.quaternion.copy(QUP); f.position.set(FS.x,H_C,FS.z); f.userData.TH.visible=true; B3.ringS.visible=false; }
+function resetVisuals(){
+  B3.tws.length=0; setLamp(false,true); B3.lamp=0; boardToTray(); flaskToTray(); fxStop(); hideAllTags(); setThermal(false,true); B3.thermal=0; resetSim(); B3.ghost.visible=false;
+}
+
+
+/* =====================================================================
+   KHỞI TẠO 3D + VÒNG LẶP DUY NHẤT
+   ===================================================================== */
+function init3D(){
+  if(B3.ok) return; const host=$id('sceneB');
+  const opt=(k,txt)=>`<button type="button" class="pill1 opt" data-act="pred" data-k="${k}" id="opt_${k}"><b>${k}</b><span>${txt}</span></button>`;
+  host.innerHTML='<canvas id="c3"></canvas><div id="lbl3"><svg id="ln3"></svg></div>'+
+    '<div class="tbar" id="tbar"><button type="button" class="tb" id="rstBtn">↺ Làm lại</button><button type="button" class="tb" id="lblBtn" aria-pressed="true">📍 Ẩn ghi chú</button><button type="button" class="tb" id="camBtn" aria-pressed="false" hidden>📷 Camera tia nhiệt</button></div>'+
+    '<div class="rotHint" id="rotHint">🖐 Kéo: xoay · Chuột phải / Shift + kéo: di chuyển · Cuộn: phóng to</div>'+
+    '<div class="clock3" id="clock3" hidden><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="27" fill="#fff" stroke="#ffd23f" stroke-width="3"/>'+Array.from({length:12},(_,i)=>`<line x1="30" y1="6" x2="30" y2="${i%3?9:11}" stroke="#16423c" stroke-width="${i%3?1.5:2.5}" transform="rotate(${i*30} 30 30)"/>`).join('')+'<line id="hHand" x1="30" y1="30" x2="30" y2="16" stroke="#16423c" stroke-width="3.5" stroke-linecap="round"/><line id="mHand" x1="30" y1="30" x2="30" y2="9" stroke="#d9534f" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="30" r="2.6" fill="#16423c"/></svg><div><b id="clkT"></b><small id="clkS"></small><div class="bar"><i id="clkBar"></i></div></div></div>'+
+    '<div class="graph3" id="graph3" hidden><canvas id="gcv" width="440" height="220" aria-label="Đồ thị nhiệt độ theo thời gian"></canvas></div>'+
+    '<div class="chip3" id="chip3" hidden>⚠️ Bóng đèn dây tóc rất nóng khi sáng, không chạm tay vào bóng đèn.</div>'+
+    '<div class="thermBadge" id="thermBadge" hidden>CAMERA TIA NHIỆT</div>'+
+    '<div class="ttip" id="ttip" hidden></div>'+
+    '<div class="predict" id="predict" hidden><div class="gbox"><h4>Bật đèn thì nhiệt độ trong bình thay đổi thế nào? Nếu đặt tấm gỗ chắn giữa đèn và bình thì sao?</h4><div class="opts">'+
+      opt('A','Bật đèn: <strong>không đổi</strong> · Chắn tấm gỗ: <strong>không đổi</strong>')+opt('B','Bật đèn: <strong>tăng</strong> · Chắn tấm gỗ: <strong>vẫn tăng như cũ</strong>')+
+      opt('C','Bật đèn: <strong>tăng</strong> · Chắn tấm gỗ: <strong>giảm dần về như cũ</strong>')+opt('D','Bật đèn: <strong>giảm</strong> · Chắn tấm gỗ: <strong>tăng</strong>')+'</div></div></div>'+
+    '<div class="chk" id="chk" hidden><h4>Năng lượng từ đèn tới bình bằng cách nào?</h4><div class="row">'+
+      '<button type="button" class="pill1" data-act="chk" data-k="dn" id="chk_dn"></button><button type="button" class="pill1" data-act="chk" data-k="dl" id="chk_dl"></button><button type="button" class="pill1" data-act="chk" data-k="tn" id="chk_tn"></button></div><small>Bấm đủ cả 3 thẻ để tiếp tục.</small></div>'+
+    '<div class="loading3" id="loading3">Đang tải mô hình 3D…</div>';
+  const cv=$id('c3'); B3.cv=cv; const rd=B3.rd=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true}); rd.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5)); rd.setClearColor(0,0); rd.toneMapping=THREE.ACESFilmicToneMapping; rd.toneMappingExposure=.98;
+  B3.sc=new THREE.Scene(); const pm=new THREE.PMREMGenerator(rd); B3.sc.environment=pm.fromScene(new RoomEnvironment(),.04).texture;
+  B3.cam=new THREE.PerspectiveCamera(32,1,3,700);
+  const lb=$id('lbl3'); B3.ln=$id('ln3'); L3.forEach(l=>{ const d=document.createElement('div'); d.className='n3'; d.innerHTML=`<b>${l.n}</b><span>${l.t}</span>`; lb.appendChild(d); l.el=d; });
+  lb.insertAdjacentHTML('beforeend','<div class="dz" id="dz" style="display:none"></div><div class="hand3" id="hand3" style="display:none"><i></i><span>👆</span></div><div class="thl" id="thl_b" hidden></div><div class="thl" id="thl_s" hidden></div>'+Object.keys(TAGS).map(k=>`<div class="tag3" id="tg_${k}" hidden style="--c:${TAGS[k].c}"></div>`).join(''));
+  Object.keys(TAGS).forEach(k=>{ TAGS[k].el=$id('tg_'+k); });
+  /* điều khiển: kéo chuột trái = xoay; chuột phải / Shift + kéo / hai ngón = di chuyển; cuộn / chụm = phóng to */
+  const pts=new Map(); let dr=null, pd=0, pmid=null;
+  const touch=()=>{ B3.userTouched=true; };
+  const pan=(dx,dy)=>{ const s=B3.gh*1.15/Math.max(100,B3.H)*B3.zoom, c=Math.cos(B3.yaw), n=Math.sin(B3.yaw); touch(); B3.tx=clamp(B3.tx-(c*dx+n*dy)*s,-110,95); B3.tz=clamp(B3.tz-(-n*dx+c*dy)*s,-30,40); };
+  cv.style.touchAction='none'; bindDrag(cv);
+  cv.addEventListener('contextmenu',e=>e.preventDefault());
+  cv.addEventListener('pointerdown',e=>{ pts.set(e.pointerId,[e.clientX,e.clientY]); if(pts.size===2){ const a=[...pts.values()]; pd=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]); pmid=[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2]; dr=null; return; } dr={x:e.clientX,y:e.clientY,pan:e.button===2||e.shiftKey}; try{ cv.setPointerCapture(e.pointerId); }catch(_){} });
+  cv.addEventListener('pointermove',e=>{ if(pts.has(e.pointerId)) pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2&&pd>0){ const a=[...pts.values()], d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]), m=[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2]; if(d>0){ touch(); B3.zoom=clamp(B3.zoom*pd/d,.25,1.6); pd=d; } if(pmid){ pan(m[0]-pmid[0],m[1]-pmid[1]); } pmid=m; return; }
+    if(!dr) return; const dx=e.clientX-dr.x, dy=e.clientY-dr.y; dr.x=e.clientX; dr.y=e.clientY;
+    if(dr.pan){ pan(dx,dy); } else { touch(); B3.yaw=clamp(B3.yaw-dx*.0075,-1.4,1.4); B3.pitch=clamp(B3.pitch+dy*.005,.04,1.35); }
+    if(!B3.moved){ B3.moved=true; $id('rotHint').style.opacity='0'; } });
+  const end=e=>{ pts.delete(e.pointerId); pd=0; pmid=null; dr=null; };
+  cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
+  cv.addEventListener('wheel',e=>{ e.preventDefault(); touch(); B3.zoom=clamp(B3.zoom*(1+e.deltaY*.0012),.25,1.6); },{passive:false});
+  $id('lblBtn').onclick=()=>{ B3.showLbl=!B3.showLbl; const b=$id('lblBtn'); b.textContent=B3.showLbl?'📍 Ẩn ghi chú':'📍 Hiện ghi chú'; b.setAttribute('aria-pressed',B3.showLbl); b.classList.toggle('off',!B3.showLbl); };
+  $id('rstBtn').onclick=()=>{ resetCurrent(); };
+  $id('camBtn').onclick=()=>toggleCam();
+  bindPick(cv); B3.ok=true; requestAnimationFrame(loop3D);
+  loadModels().then(()=>{ try{ buildScene3D(); const l=$id('loading3'); if(l) l.remove(); layoutScenes(); enterStage(S.stage); render(); }catch(err){ console.error(err); window.__labErr=String(err&&err.stack||err); const l=$id('loading3'); if(l) l.textContent='Không dựng được cảnh 3D'; } });
+}
+function resize3D(top,bottom,right){
+  if(!B3.ok) return; const host=$id('sceneB'), W=host.clientWidth||1, H=Math.max(120,host.clientHeight||1);
+  B3.cv.style.cssText=`position:absolute;left:0;top:0;width:${W}px;height:${H}px;display:block`;
+  const box=`position:absolute;left:0;top:0;width:${W}px;height:${H}px;pointer-events:none;overflow:hidden`; $id('lbl3').style.cssText=box;
+  if(B3.W!==W||B3.H!==H||B3.top!==top||B3.bot!==bottom||B3.right!==right){
+    B3.W=W; B3.H=H; B3.top=top; B3.bot=bottom; B3.right=right; B3.visH=Math.max(100,H-top-bottom); B3.visW=Math.max(100,W-right); L3.forEach(l=>l.w=0); B3.rd.setSize(W,H,false); B3.cam.aspect=W/H;
+    B3.cam.setViewOffset(W,H,right/2,(bottom-top)/2,W,H); B3.cam.updateProjectionMatrix();
+  }
+}
+const _white=new THREE.Color(0xffffff), _cold=new THREE.Color(0x7aa8d8);
+function loop3D(now){
+  requestAnimationFrame(loop3D);
+  B3.dt=Math.min(.05,Math.max(0,(now-(B3.last||now))/1000)); B3.last=now;
+  if(document.hidden){ B3.last=null; return; }
+  if(S.stage>3||!B3.ok||!B3.ready||$id('sceneB').hidden) return;
+  const dt=B3.dt||.016, T=now/1000;
+  for(let i=B3.tws.length-1;i>=0;i--){ const t=B3.tws[i]; if(t.t0==null) t.t0=now; const p=Math.max(0,Math.min(1,(now-t.t0)/t.ms)); t.fn(ease(p)); if(p>=1){ B3.tws.splice(i,1); t.res(); } }
+  const g=GOAL[B3.camKey]||GOAL.all, k=1-Math.exp(-dt*3.2);
+  if(!B3.userTouched){ const t=g.t(); B3.tx+=(t[0]-B3.tx)*k; B3.ty+=(t[1]-B3.ty)*k; B3.tz+=(t[2]-B3.tz)*k; B3.pitch+=(g.pitch-B3.pitch)*k; B3.yaw+=(0-B3.yaw)*k; B3.zoom+=(1-B3.zoom)*k; }
+  B3.gw+=(g.w-B3.gw)*k; B3.gh+=(g.h-B3.gh)*k;
+  const vh=B3.visH||B3.H, vw=B3.visW||B3.W, tan=Math.tan(B3.cam.fov*Math.PI/360), dist=Math.max(B3.H*B3.gh/vh,B3.H*B3.gw/vw)/(2*tan)*1.06*B3.zoom;
+  const cp=Math.cos(B3.pitch); B3.cam.position.set(B3.tx+Math.sin(B3.yaw)*cp*dist,B3.ty+Math.sin(B3.pitch)*dist,B3.tz+Math.cos(B3.yaw)*cp*dist); B3.cam.lookAt(B3.tx,B3.ty,B3.tz);
+  if((B3.fc=(B3.fc||0)+1)%20===0) layoutScenes();
+  /* nhiệt độ + các bước */
+  if(S.stage>=2) simStep(dt);
+  stepTick();
+  /* đèn sáng / tắt trong 0,4 s */
+  B3.lamp+=((B3.lampOn?1:0)-B3.lamp)*(1-Math.exp(-dt/.13)); const Lm=B3.lamp<.003?0:B3.lamp;
+  B3.bulbMats.fmat.forEach(m=>{ m.emissiveIntensity=3*Lm; }); B3.bulbMats.gmat.forEach(m=>{ m.emissiveIntensity=.25*Lm; });
+  B3.bulbLight.intensity=60*Lm; B3.bulbGlow.material.opacity=.85*Lm;
+  /* camera tia nhiệt: tối đi, vật nóng ánh cam, vật lạnh xanh */
+  B3.thermal+=(B3.thermalWant-B3.thermal)*(1-Math.exp(-dt/.15)); const th=B3.thermal<.003?0:(B3.thermal>.997?1:B3.thermal);
+  B3.lights.forEach(l=>l.intensity=l.userData.i0*B3.dim); B3.lights[0].color.lerpColors(_white,_cold,th);
+  B3.rd.setClearColor(0x06121c,th); B3.rd.toneMappingExposure=.98*(.35+.65*B3.dim)*lerp(1,.45,th);
+  B3.flaskB.userData.mat.emissiveIntensity=th*clamp((SIM.TB-25)/20,0,1)*1.3; B3.flaskS.userData.mat.emissiveIntensity=th*clamp((SIM.TS-25)/20,0,1)*1.3;
+  B3.flaskB.userData.setT(SIM.TB); B3.flaskS.userData.setT(SIM.TS);
+  B3.ghost.visible=S.stage===1;
+  updateRays(T);
+  /* hạt không khí thưa thớt / khí nóng đi lên */
+  { const f=B3.fx, ka=1-Math.exp(-dt*5); f.air+=(f.airW-f.air)*ka; f.rise+=(f.riseW-f.rise)*ka;
+    B3.airG.visible=f.air>.02; if(B3.airG.visible) for(const a of B3.air){ a.s.position.set(a.x+Math.sin(T*.8*a.sp+a.a)*.9,a.y+Math.cos(T*.6*a.sp+a.b)*.9,a.z+Math.sin(T*.5*a.sp+a.b)*.9); a.s.material.opacity=.75*f.air; }
+    B3.riseG.visible=f.rise>.02; if(B3.riseG.visible) for(const u of B3.rise){ u.h=(u.h+dt*u.sp)%1; const rad=.6+u.h*8*u.rr; u.s.position.set(LAMP.x+Math.cos(u.a+T*.3)*rad*.6,H_C+5+u.h*30,LAMP.z+Math.sin(u.a+T*.3)*rad*.6); u.s.scale.setScalar(1.6+u.h*3.4); u.s.material.opacity=.6*Math.sin(u.h*Math.PI)*f.rise; } }
+  glow3D(now);
+  B3.rd.render(B3.sc,B3.cam);
+  /* vòng vàng đích kéo thả + bàn tay gợi ý */
+  { const dz=$id('dz'), sp=dragSpec(); if(dz){ if(sp){ const s=toScreen(dstPoint(sp.dst)); dz.style.display=''; dz.style.transform=`translate(${(s[0]-34).toFixed(1)}px,${(s[1]-34).toFixed(1)}px)`; } else dz.style.display='none'; }
+    const hd=$id('hand3'), tg=sp?sp.src:curTarget();
+    if(hd&&tg&&now<B3.hintT&&!B3.dragging){ const q=handPoint(tg).project(B3.cam), hx=(q.x*.5+.5)*B3.W, hy=(-q.y*.5+.5)*B3.H;
+      if(B3.hx==null||hd.style.display==='none'){ B3.hx=hx; B3.hy=hy; } const kh=1-Math.exp(-dt*10); B3.hx+=(hx-B3.hx)*kh; B3.hy+=(hy-B3.hy)*kh;
+      hd.style.display=''; hd.style.transform=`translate(${(B3.hx-17).toFixed(1)}px,${(B3.hy+2).toFixed(1)}px)`; }
+    else if(hd) hd.style.display='none'; }
+  updateThl(); updateTags(); updateLabels(); drawGraph(now); tickClock(now);
+}
+/* nhãn số nhiệt kế ghim cạnh đầu nhiệt kế */
+function updateThl(){
+  const show=S.stage>=1&&S.stage<=3, items=[[$id('thl_b'),B3.flaskB,SIM.TB,true],[$id('thl_s'),B3.flaskS,SIM.TS,SIM.silverOn]];
+  for(const [el,f,Tv,vis] of items){ if(!el) continue; const on=show&&vis&&B3.showLbl!==undefined; if(el.hidden===on) el.hidden=!on; if(!on) continue;
+    const q=f.localToWorld(V3(0,22.5,0)).project(B3.cam), ax=(q.x*.5+.5)*B3.W, ay=(-q.y*.5+.5)*B3.H, tx='🌡 '+fmtT(Tv)+' °C';
+    if(el._t!==tx){ el._t=tx; el.textContent=tx; const u=clamp((Tv-25)/20,0,1), c=`rgb(${Math.round(lerp(74,255,u))},${Math.round(lerp(144,120,u))},${Math.round(lerp(217,30,u))})`; el.style.setProperty('--c',c); }
+    el.style.transform=`translate(${(ax+14).toFixed(0)}px,${(ay-12).toFixed(0)}px)`; }
+}
+function updateTags(){
+  for(const id in TAGS){ const t=TAGS[id]; if(!t.on||!t.el) continue; const q=t.get().project(B3.cam), ax=(q.x*.5+.5)*B3.W, ay=(-q.y*.5+.5)*B3.H, w=t.el.offsetWidth||120;
+    t.el.style.transform=`translate(${clamp(ax-w/2,6,(B3.visW||B3.W)-w-6).toFixed(0)}px,${clamp(ay,(B3.top||0)+4,B3.H-(B3.bot||0)-30).toFixed(0)}px)`; }
+}
+function updateLabels(){
+  if(!B3.showLbl||S.stage>3){ L3.forEach(l=>{ l.el.style.display='none'; l.px=null; }); B3.ln.innerHTML=''; return; }
+  const small=B3.W<640, tgt=S.stage===0?B3.hintId:null, shown=[], kk=S.stage===0?0:(small?.62:1); let svg='';
+  for(const l of L3){
+    const q=l.get().project(B3.cam); if(q.z>1){ l.el.style.display='none'; continue; }
+    const ax=(q.x*.5+.5)*B3.W, ay=(-q.y*.5+.5)*B3.H;
+    if(ax<8||ax>B3.visW-8||ay<(B3.top||0)+6||ay>B3.H-(B3.bot||0)-6){ l.el.style.display='none'; continue; }
+    if(l.el.style.display==='none') l.el.style.display='';
+    if(!l.w){ l.w=l.el.offsetWidth; l.h=l.el.offsetHeight; l.r=l.el.firstChild.offsetWidth/2; }
+    l.el.classList.toggle('on',l.id===tgt);
+    const left=l.dx<0; shown.push({l,ax,ay,x:left?ax+l.dx*kk-l.w+l.r:ax+l.dx*kk-l.r,y:ay+l.dy*kk-l.h/2,w:l.w,h:l.h,left});
+  }
+  L3.forEach(l=>{ if(!shown.some(s=>s.l===l)) l.px=null; });
+  shown.sort((a,b)=>a.y-b.y); const placed=[];
+  for(const it of shown){
+    if(S.stage!==0) for(let n=0;n<8;n++){ let mvd=false; for(const o of placed){ if(it.x<o.x+o.w+4&&it.x+it.w+4>o.x&&it.y<o.y+o.h+3&&it.y+it.h+3>o.y){ it.y=o.y+o.h+4; mvd=true; } } if(!mvd) break; }
+    placed.push(it); it.x=clamp(it.x,4,B3.visW-it.w-4); it.y=clamp(it.y,(B3.top||0)+4,B3.H-(B3.bot||0)-it.h-4);
+    if(it.l.px==null||S.stage===0){ it.l.px=it.x; it.l.py=it.y; } else { it.l.px+=(it.x-it.l.px)*.18; it.l.py+=(it.y-it.l.py)*.18; } it.x=it.l.px; it.y=it.l.py;
+    it.l.el.classList.toggle('lf',it.left); it.l.el.style.transform=`translate(${it.x.toFixed(0)}px,${it.y.toFixed(0)}px)`;
+    const cx=it.left?it.x+it.w-it.l.r:it.x+it.l.r, cy=it.y+it.h/2;
+    svg+=`<line x1="${it.ax.toFixed(1)}" y1="${it.ay.toFixed(1)}" x2="${cx.toFixed(1)}" y2="${cy.toFixed(1)}"/><circle cx="${it.ax.toFixed(1)}" cy="${it.ay.toFixed(1)}" r="3.6"/>`;
+  }
+  B3.ln.innerHTML=svg;
+}
+/* đồng hồ thời gian chạy */
+function showClock(on){ const c=$id('clock3'); if(c) c.hidden=!on; }
+function setClock(h,total,title,sub){ const c=$id('clock3'); if(!c) return; c.hidden=false; $id('hHand').setAttribute('transform',`rotate(${(h%12)*30} 30 30)`); $id('mHand').setAttribute('transform',`rotate(${(h%1)*360} 30 30)`); $id('clkT').textContent=title; $id('clkS').textContent=sub||''; $id('clkBar').style.width=(100*clamp(h/total,0,1)).toFixed(1)+'%'; }
+let _ck=0;
+function tickClock(now){
+  const c=$id('clock3'); if(!c||c.hidden||now-_ck<150) return; _ck=now;
+  setClock(SIM.t/60,1,Math.floor(SIM.t)+' s',(B3.lampOn?'Đèn: bật':'Đèn: tắt')+(SIM.boardIn?' · có tấm gỗ':'')+(S.speed>1?' · ×3':''));
+}
+/* ===== ZOOM KHI XEM DỤNG CỤ (bước 1) ===== */
+const ZOOMSZ={flaskB:[42,60,10],flaskS:[42,30,2],bulb:[40,48,4],board:[58,42,6],stand:[50,78,-6]};
+function showTip(id){
+  const l=L3.find(x=>x.id===id), tip=$id('ttip'); if(!l||!tip||!B3.cam) return;
+  tip.innerHTML=`<button type="button" class="xbtn" aria-label="Đóng">✕</button><div class="pc-body"><div class="kick">DỤNG CỤ ${l.n}</div><h3>${l.t}</h3><p>${USE[id]}</p></div>`;
+  tip.hidden=false; tip.querySelector('.xbtn').onclick=()=>{ tip.hidden=true; };
+  const q=l.get().project(B3.cam), ax=(q.x*.5+.5)*B3.W, ay=(-q.y*.5+.5)*B3.H, w=tip.offsetWidth, h=tip.offsetHeight, vw=B3.visW||B3.W;
+  let left=ax+26; if(left+w>vw-8) left=ax-26-w; left=Math.max(8,left);
+  const top=Math.max((B3.top||0)+8,Math.min(B3.H-(B3.bot||0)-h-8,ay-h/2));
+  tip.style.left=left+'px'; tip.style.top=top+'px';
+}
+function zoomIn(id){
+  const l=L3.find(x=>x.id===id), z=ZOOMSZ[id]||[40,30,0]; if(!l) return;
+  B3.zoomId=id; B3.userTouched=false; GOAL.zoom={t:()=>{ const p=l.get(); return [p.x,p.y+z[2],p.z]; },w:z[0],h:z[1],pitch:.22}; B3.camKey='zoom';
+}
+function zoomOut(){ B3.zoomId=null; B3.userTouched=false; B3.camKey='all'; const tp=$id('ttip'); if(tp) tp.hidden=true; }
+
+
+/* =====================================================================
+   BƯỚC 1: CHUẨN BỊ DỤNG CỤ
+   ===================================================================== */
+const tray={}; const NEED=5; let lastPick=null;
+function hintTool(auto){
+  const l=L3.find(x=>!tray[x.id]); if(!l) return;
+  B3.hintId=l.id; clearTimeout(hintTool._t); hintTool._t=setTimeout(()=>{ B3.hintId=null; },5000); if(!auto) toast('Gợi ý: hãy xem số '+l.n+' – «'+l.t+'»');
+}
+function viewObj(id){
+  const l=L3.find(x=>x.id===id); if(!l) return;
+  tray[id]=true; lastPick=id; S.miss=false; B3.hintId=null; if(l.el) l.el.classList.add('got'); beep(true);
+  const tp=$id('ttip'); if(tp) tp.hidden=true;
+  if(B3.zoomId===id) zoomOut(); else { zoomIn(id); clearTimeout(viewObj._t); viewObj._t=setTimeout(()=>{ if(S.stage===0&&B3.zoomId===id) showTip(id); },750); }
+  render();
+}
+function panelA(){
+  const n=Object.keys(tray).length, all=n>=NEED, lp=lastPick&&L3.find(x=>x.id===lastPick);
+  let info, say=null, vk=null;
+  if(all){ S.ok[0]=true; info='✅ <b>Em đã xem hết các dụng cụ!</b> Hãy sang <b>bước 2: Dự đoán</b>.'; }
+  else if(lp){ info=`✅ <b>${lp.t}:</b> ${USE[lp.id]} <small>(${n}/${NEED})</small>`; }
+  else { info=`Bấm vào <b>từng số</b> để xem tên và công dụng của dụng cụ (<b>${n}/${NEED}</b>).`; vk='dc'; }
+  setBottom(info,pill('💡','Gợi ý','hint1')+pill('➡️','Sang bước 2: Dự đoán','next',{cls:all?'warm go':''}),'a'+n+(lastPick||'')+(B3.ready?'r':''),say,all?'ok':null,vk);
+  return Array.from({length:NEED},(_,i)=>({t:'',on:i<n}));
+}
+
+/* =====================================================================
+   BƯỚC 2: DỰ ĐOÁN
+   ===================================================================== */
+const PRED={A:'Bật đèn: không đổi · Chắn tấm gỗ: không đổi',B:'Bật đèn: tăng · Chắn tấm gỗ: vẫn tăng như cũ',C:'Bật đèn: tăng · Chắn tấm gỗ: giảm dần về như cũ',D:'Bật đèn: giảm · Chắn tấm gỗ: tăng'};
+function panelB(){
+  const p=S.predict; if(p) S.ok[1]=true;
+  ['A','B','C','D'].forEach(k=>{ const o=$id('opt_'+k); if(o) o.classList.toggle('sel',p===k); });
+  if(!p) setBottom('Em hãy chọn <b>một đáp án</b> trong hộp bên dưới nhé.','','b0',null,null,'dd');
+  else setBottom(`Em dự đoán: <b>${esc(PRED[p])}</b>. Hãy làm thí nghiệm để kiểm tra nhé!`,pill('💡','Sang bước 3: Thí nghiệm','next',{cls:'warm go'}),'b'+p,null,null,'dd');
+  return [{t:'Chọn dự đoán',on:!!p}];
+}
+
+/* =====================================================================
+   BƯỚC 3: THÍ NGHIỆM HÌNH 28.5
+   ===================================================================== */
+/* ===== BƯỚC 3: THÍ NGHIỆM HÌNH 28.5 ===== */
+const PREP_T=[
+  {k:'on',     ico:'💡', s:'Bật đèn',      n:'Bấm công tắc để bật đèn, quan sát nhiệt kế'},
+  {k:'board',  ico:'🪵', s:'Chắn tấm gỗ',  n:'Đặt tấm gỗ vào giữa đèn và bình'},
+  {k:'remove', ico:'↩️', s:'Bỏ tấm gỗ',    n:'Bỏ tấm gỗ ra, quan sát nhiệt kế'}
+];
+function resetE(){
+  B3.tws.length=0; E.done=0; E.phase='on'; E.sub='start'; E.busy=false; E.note=null;
+  if(B3.ready){ setLamp(false,true); boardToTray(); resetSim(); showClock(false); }
+}
+function stepTick(){ if(S.stage===2) tickE(); else if(S.stage===3) tickR(); }
+function tickE(){
+  if(E.done>=3||E.busy) return;
+  if(E.phase==='on'&&E.sub==='watch'&&SIM.TB>=33){ E.done=1; E.phase='board'; E.sub='start'; lastKey=''; render(); }
+  else if(E.phase==='board'&&E.sub==='watch'&&(SIM.TB<=E.peak-5||SIM.t-E.tBoard>=12)){ E.done=2; E.phase='remove'; E.sub='start'; lastKey=''; render(); }
+  else if(E.phase==='remove'&&E.sub==='watch'&&SIM.TB>=E.tMin+3){ E.done=3; S.ok[2]=true; sfx('tada'); lastKey=''; render(); }
+}
+function pressSwitch(){
+  if(S.stage===2){
+    if(E.busy) return;
+    if(E.done>=3){ setLamp(!B3.lampOn); return; }
+    if(E.phase==='on'&&E.sub==='start'){ resetSim(); setLamp(true); E.sub='watch'; showClock(true); lastKey=''; render(); return; }
+    beep(false); toast('Đèn đang sáng. Em hãy làm theo hướng dẫn nhé.'); return;
+  }
+  if(S.stage===3){
+    if(R.busy||SIM.cool) return;
+    const on=!B3.lampOn; setLamp(on); if(on&&R.phase==='compare') setThermal(true); lastKey=''; render();
+  }
+}
+async function dropDone(dk){
+  const slot=V3(BOARD_AT.x,0,BOARD_AT.z);
+  if(dk.src==='board'&&dk.dst==='boardSlot'){
+    E.busy=true; await moveTo(B3.board,slot,QUP,800,6); sfx('thud'); SIM.boardIn=true; E.sub='watch'; E.tBoard=SIM.t; E.peak=SIM.TB; E.busy=false; lastKey=''; render();
+  } else if(dk.src==='board'&&dk.dst==='tray'){
+    E.busy=true; SIM.boardIn=false; E.sub='watch'; E.tMin=SIM.TB; await moveTo(B3.board,B3.boardRest.p,B3.boardRest.q,800,8); sfx('thud'); E.busy=false; lastKey=''; render();
+  } else if(dk.src==='flaskS'){ placeSilver(); }
+}
+function onPick(key){
+  if(S.stage===0){ if(B3.ready) viewObj(key==='switch'?'bulb':key); return; }
+  if(!B3.ready||E.busy||R.busy) return;
+  if(B3.dropOK){ B3.dropOK=false; const dk=dragSpec(); if(dk) dropDone(dk); return; }
+  if(S.stage<2) return;
+  if(key==='switch'){ pressSwitch(); return; }
+  const dk=dragSpec(); if(dk&&key===dk.src){ beep(false); toast(dk.msg); return; }
+  if(S.stage===2&&E.done<3&&E.phase==='on'&&E.sub==='start'){ beep(false); toast('Hãy bấm công tắc trên đế đèn.'); }
+}
+const speedPill=()=>pill('⏩','Tua nhanh ×3','speed',{cls:S.speed>1?'on':''});
+function panelT(){
+  const done=E.done;
+  if(done>=3){
+    const ok=S.predict==='C', pr=S.predict?`Dự đoán của em: <b>${ok?'đúng':'chưa đúng'}</b>.`:'';
+    setBottom(`✅ Bật đèn: nhiệt độ <b>tăng</b>. Chắn tấm gỗ: nhiệt độ <b>giảm dần về như cũ</b>. Bỏ tấm gỗ: nhiệt độ <b>lại tăng</b>. ${pr}<br>❓ <i>Năng lượng từ đèn truyền tới bình bằng cách nào?</i>`,pill('📷','Sang bước 4: Tia nhiệt','next',{cls:'warm go'}),'t9'+S.predict,null,'ok','kq');
+  } else {
+    let info,vk=null;
+    if(E.phase==='on'&&E.sub==='start'){ info='Em hãy <b>bấm công tắc</b> trên đế đèn để bật đèn, rồi quan sát nhiệt kế.'; vk='bd'; }
+    else if(E.phase==='on') info='Đèn đã sáng. Em hãy quan sát nhiệt kế: nhiệt độ trong bình đang <b>tăng</b>.';
+    else if(E.phase==='board'&&E.sub==='start'){ info='Nhiệt độ trong bình đang tăng lên. Bây giờ em hãy <b>kéo tấm gỗ</b> đặt vào giữa đèn và bình, rồi tiếp tục quan sát nhiệt kế.'; vk='cg'; }
+    else if(E.phase==='board') info='Tấm gỗ đã chắn giữa đèn và bình. Em hãy quan sát nhiệt kế và đồ thị.';
+    else if(E.phase==='remove'&&E.sub==='start') info='Nhiệt độ đang giảm dần về như cũ. Bây giờ em hãy <b>bỏ tấm gỗ ra</b>.';
+    else info='Tấm gỗ đã được bỏ ra. Em hãy quan sát nhiệt kế: nhiệt độ lại <b>tăng</b>.';
+    setBottom(info,speedPill()+pill('💡','Gợi ý','hint3d'),'t'+E.phase+E.sub+S.speed,null,null,vk);
+  }
+  return PREP_T.map((p,i)=>({t:p.s,on:i<done}));
+}
+
+/* =====================================================================
+   BƯỚC 4: TIA NHIỆT VÀ BỀ MẶT VẬT
+   ===================================================================== */
+const PREP_R=[
+  {k:'check',  ico:'🔎', s:'Kiểm tra 3 khả năng', n:'Dẫn nhiệt? Đối lưu? Hay cách khác?'},
+  {k:'silver', ico:'🪞', s:'Đặt bình tráng bạc',  n:'Đặt bình tráng bạc lên giá thứ hai, cách đèn bằng bình phủ đen'},
+  {k:'compare',ico:'🌡️', s:'So sánh hai bình',    n:'Bật đèn và so sánh hai nhiệt kế'}
+];
+function clearRTimers(){ R.timers.forEach(clearTimeout); R.timers=[]; R.demo=false; }
+function resetR(){
+  B3.tws.length=0; clearRTimers(); R.done=0; R.phase='check'; R.cards={dn:0,dl:0,tn:0}; R.last=null; R.busy=false; R.silverIn=false; R.compared=false;
+  if(B3.ready){ flaskToTray(); fxStop(); hideAllTags(); setThermal(false,true); }
+  updateChk(); syncCam();
+}
+function updateChk(){
+  const ck=$id('chk'); if(!ck) return; ck.hidden=!(S.stage===3&&R.phase==='check');
+  const set=(k,on,txt,ico,cls)=>{ const b=$id('chk_'+k); if(!b) return; b.className='pill1'+(on?' '+cls:''); b.innerHTML=`<i>${ico}</i>${txt}`; };
+  set('dn',R.cards.dn,R.cards.dn?'Không phải dẫn nhiệt':'Dẫn nhiệt?',R.cards.dn?'❌':'🔥','no');
+  set('dl',R.cards.dl,R.cards.dl?'Không phải đối lưu':'Đối lưu?',R.cards.dl?'❌':'💨','no');
+  set('tn',R.cards.tn,R.cards.tn?'Bức xạ nhiệt':'Cách khác?',R.cards.tn?'✅':'📷','yes');
+}
+function boardDemo(){
+  if(R.demo) return; R.demo=true; const slot=V3(BOARD_AT.x,0,BOARD_AT.z);
+  R.timers.push(setTimeout(async()=>{ await moveTo(B3.board,slot,QUP,800,6); SIM.boardIn=true; sfx('thud');
+    R.timers.push(setTimeout(async()=>{ SIM.boardIn=false; await moveTo(B3.board,B3.boardRest.p,B3.boardRest.q,800,8); sfx('thud'); R.demo=false; },6000)); },4000));
+}
+function cardClick(k){
+  if(S.stage!==3||R.phase!=='check') return;
+  R.cards[k]=1; R.last=k; fxStop(); delete S.played[k];
+  if(k==='dn'){ B3.fx.airW=1; showTag('air','Không khí – dẫn nhiệt kém nhất',16000); }
+  if(k==='dl'){ B3.fx.riseW=1; showTag('rise','Khí nóng đi lên, không đi ngang sang bình',16000); }
+  if(k==='tn'){ if(!B3.lampOn) setLamp(true); setThermal(true); boardDemo(); }
+  if(k!=='tn') R.timers.push(setTimeout(()=>{ if(R.last===k) fxStop(); },16000));
+  if(R.cards.dn&&R.cards.dl&&R.cards.tn&&!R.autoT){ R.autoT=true; R.timers.push(setTimeout(goSilver,26000)); }
+  updateChk(); syncCam(); lastKey=''; render();
+}
+function goSilver(){
+  if(S.stage!==3||R.phase!=='check') return;
+  clearRTimers(); R.autoT=false;
+  if(SIM.boardIn||B3.board.position.distanceTo(B3.boardRest.p)>1){ SIM.boardIn=false; B3.tws.length=0; B3.board.position.copy(B3.boardRest.p); B3.board.quaternion.copy(B3.boardRest.q); }
+  fxStop(); R.phase='silver'; R.done=1; B3.camKey='wide'; B3.userTouched=false; updateChk(); lastKey=''; render();
+}
+async function placeSilver(){
+  R.busy=true; B3.ringS.visible=false;
+  await moveTo(B3.flaskS,V3(FS.x,H_C,FS.z),QUP,850,8); flaskToClamp(); sfx('thud'); B3.camKey='cmp'; B3.userTouched=false; R.silverIn=true; SIM.silverOn=true;
+  setLamp(false); showTag('cool','Làm nguội hai bình về 25 °C',2300);
+  SIM.cool={e:0,dur:2,b0:SIM.TB,s0:SIM.TS,done:()=>{ R.phase='compare'; R.done=2; R.busy=false; lastKey=''; render(); }};
+  lastKey=''; render();
+}
+function tickR(){
+  if(R.phase==='compare'&&!R.compared&&!SIM.cool&&B3.lampOn&&SIM.TB-SIM.TS>=8){
+    R.compared=true; R.done=3; S.ok[3]=true; sfx('tada'); showTag('abs','Hấp thụ mạnh'); showTag('ref','Phản xạ mạnh'); lastKey=''; render();
+  }
+}
+const CARDTXT={
+  dn:'🔥 Giữa đèn và bình chỉ có <b>không khí</b> – chất dẫn nhiệt kém nhất. Vậy năng lượng <b>không</b> truyền tới bình bằng dẫn nhiệt.',
+  dl:'💨 Không khí nóng bay <b>lên phía trên</b>, không đi ngang sang bình; tấm gỗ cũng không chặn được dòng khí đi lên. Vậy đây <b>không phải</b> đối lưu.',
+  tn:'📷 Đèn phát ra các <b>tia thẳng</b> tới bình và bị tấm gỗ chặn lại – đó là <b>tia nhiệt</b>. Cách truyền nhiệt này gọi là <b>bức xạ nhiệt</b>.'
+};
+function panelR(){
+  const n=(R.cards.dn?1:0)+(R.cards.dl?1:0)+(R.cards.tn?1:0);
+  if(R.done>=3){
+    setBottom('✅ Năng lượng từ đèn tới bình bằng <b>tia nhiệt</b> – đó là <b>bức xạ nhiệt</b>. Bình <b>phủ đen</b> hấp thụ tia nhiệt mạnh nên nóng nhanh; bình <b>tráng bạc</b> phản xạ tia nhiệt nên nóng chậm.',pill('✅','Sang bước 5: Kết luận','next',{cls:'warm go'}),'r9',null,'ok','kb');
+  } else if(R.phase==='check'){
+    const info=R.last?CARDTXT[R.last]+` <small>(${n}/3 thẻ)</small>`:'Em hãy bấm lần lượt <b>cả 3 thẻ</b> ở góc dưới bên trái để kiểm tra từng khả năng.';
+    setBottom(info,n>=3?pill('➡️','Tiếp tục: đặt bình tráng bạc','goSilver',{cls:'warm go'}):pill('💡','Gợi ý','hint3d'),'r'+(R.last||'')+n,null,null,R.last||null);
+  } else if(R.phase==='silver'){
+    setBottom('Em hãy <b>kéo bình tráng bạc</b> từ khay thả vào vòng vàng ở kẹp của <b>giá bên trái đèn</b>.',pill('💡','Gợi ý','hint3d'),'rs'+(R.busy?1:0),null,null,null);
+  } else {
+    const info=B3.lampOn?'Hai bình đang nóng lên. Em hãy quan sát <b>hai nhiệt kế</b> và các tia nhiệt.':'Em hãy <b>bấm công tắc</b> để bật đèn rồi so sánh nhiệt độ hai bình.';
+    setBottom(info,speedPill()+pill('💡','Gợi ý','hint3d'),'rc'+(B3.lampOn?1:0)+S.speed,null,null,'bm');
+  }
+  return PREP_R.map((p,i)=>({t:p.s,on:i<R.done}));
+}
+
+/* =====================================================================
+   BƯỚC 5: KẾT LUẬN
+   ===================================================================== */
+function buildK(){
+  const host=$id('sceneC'); if(!host.dataset.built){ host.dataset.built='1';
+    host.innerHTML=`<div class="cc"><svg viewBox="0 0 400 300" role="img" aria-label="Bóng đèn toả tia nhiệt: bình đen hấp thụ, bình bạc phản xạ, tấm gỗ chặn tia">
+      <defs><radialGradient id="kg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".4" stop-color="#ffb347" stop-opacity=".55"/><stop offset="1" stop-color="#ff8a2a" stop-opacity="0"/></radialGradient>
+      <linearGradient id="ks" x1="0" x2="1"><stop offset="0" stop-color="#f4f7f9"/><stop offset=".5" stop-color="#b9c4cc"/><stop offset="1" stop-color="#eef2f4"/></linearGradient></defs>
+      <rect width="400" height="300" fill="#10303a"/><rect y="262" width="400" height="38" fill="#1b4650"/>
+      <circle cx="62" cy="150" r="64" fill="url(#kg)"/>
+      <g stroke="#ff6a2b" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M90 140L283 88"/><path d="M90 148L174 150"/><path d="M90 162L284 214"/></g>
+      <g stroke="#ffc79a" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="6 5"><path d="M284 214L214 175"/></g>
+      <circle cx="283" cy="88" r="6" fill="#ffd27a"/><circle cx="174" cy="150" r="5" fill="#ffd27a"/>
+      <rect x="176" y="96" width="12" height="108" rx="3" fill="#8a6a45"/><rect x="164" y="204" width="36" height="8" rx="3" fill="#6d5436"/>
+      <circle cx="62" cy="150" r="22" fill="#ffe9a8" stroke="#fff3c9" stroke-width="3"/><rect x="52" y="170" width="20" height="14" rx="3" fill="#9aa3a8"/>
+      <path d="M54 150l8-10 8 10" stroke="#ff9a3c" stroke-width="2.5" fill="none"/>
+      <circle cx="312" cy="82" r="30" fill="#1c1c1c" stroke="#4a4a4a" stroke-width="2"/><rect x="306" y="36" width="12" height="20" fill="#1c1c1c"/>
+      <circle cx="312" cy="220" r="30" fill="url(#ks)" stroke="#dfe7ec" stroke-width="2"/><rect x="306" y="174" width="12" height="20" fill="#cfd8de"/>
+      <g font-family="Roboto,Arial" font-weight="700" font-size="13" fill="#fff"><text x="350" y="56" text-anchor="end" fill="#ffb27a">Hấp thụ</text><text x="350" y="262" text-anchor="end" fill="#bfe6ff">Phản xạ</text><text x="182" y="88" text-anchor="middle" fill="#e6c9a0">Bị chặn</text></g></svg>
+      <div class="ck"><h3>Em đã khám phá ra điều gì?</h3>
+        <div class="ci"><i>☀️</i><span><b>Tia nhiệt</b> mang năng lượng, truyền thẳng, phản xạ được, không truyền qua vật chắn sáng. Hình thức truyền nhiệt bằng tia nhiệt gọi là <b>bức xạ nhiệt</b>.</span></div>
+        <div class="ci"><i>🌌</i><span>Tia nhiệt <b>truyền được cả trong chân không</b> — nhờ vậy Mặt Trời sưởi ấm được Trái Đất.</span></div>
+        <div class="ci"><i>🎨</i><span>Mặt ngoài <b>càng sẫm màu, càng xù xì</b> → <b>hấp thụ</b> tia nhiệt càng mạnh; <b>càng nhẵn, càng sáng màu</b> → <b>phản xạ</b> tia nhiệt càng mạnh.</span></div>
+        <p class="cl">🌍 Vậy vì sao Trái Đất giữ được hơi ấm của Mặt Trời? Cùng khám phá ở phần tiếp theo!</p>
+        <p class="cs">Dự đoán ở bước 2 của em: <b id="ccPred">—</b>.</p></div></div>`; }
+  const p=$id('ccPred'); if(p) p.textContent=S.predict?(S.predict==='C'?'đúng':'chưa đúng'):'em chưa chọn';
+}
+function panelK(){
+  S.ok[4]=true;
+  setBottom('🎉 <b>Em đã khám phá xong bức xạ nhiệt!</b> Hãy ghi nhớ ba ý trong thẻ kết luận.',pill('↺','Làm lại thí nghiệm','restart')+pill('👁','Xem lại tia nhiệt','review'),'k',null,'ok','kl');
+  return ['Dụng cụ','Dự đoán','Thí nghiệm','Tia nhiệt','Bề mặt'].map(t=>({t,on:true}));
+}
+
+/* =====================================================================
+   KHUNG CHUNG
+   ===================================================================== */
+function fillCard(items){
+  $id('cK').textContent='BƯỚC '+(S.stage+1)+'/'+STAGES.length; $id('cB').textContent=STAGES[S.stage].badge; $id('cT').textContent=STAGES[S.stage].goal;
+  const guide=S.stage===2||S.stage===3;
+  const cg=$id('cGuide'); if(cg){ cg.innerHTML=guide?('<div class="gi">'+$id('binfo').innerHTML+'</div><div class="gp">'+$id('bpills').innerHTML+'</div>'):''; }
+  const cs=$id('cSteps');
+  if(S.stage===2) cs.innerHTML=PREP_T.map((p,i)=>`<span class="vs ${i<E.done?'done':i===E.done?'on':''}" data-vs="${i}" title="Bấm để xem gợi ý"><b>${i<E.done?'✓':i+1}</b>${p.s}</span>`).join('');
+  else if(S.stage===3) cs.innerHTML=PREP_R.map((p,i)=>`<span class="vs ${i<R.done?'done':i===R.done?'on':''}" data-vs="${i}" title="Bấm để xem gợi ý"><b>${i<R.done?'✓':i+1}</b>${p.s}</span>`).join('');
+  else if(S.stage===0) cs.innerHTML='';
+  else cs.innerHTML=items.map(x=>`<span class="${x.on?'done':''}"><b>${x.on?'✓':'·'}</b>${x.t}</span>`).join('');
+  { const cd=$id('card'); if(cd) cd.style.display=S.stage===0?'none':''; }
+}
+function layoutScenes(){
+  const mob=window.innerWidth<760, cardH=mob?($id('card').offsetHeight||0):0, botH=($id('bottom').offsetHeight||0);
+  const tb=$id('tbar'); if(tb) tb.style.top=(cardH+10)+'px';
+  let extra=0; const host=$id('sceneB'), hh0=host?host.clientHeight:0;
+  const pr=$id('predict'); if(pr&&!pr.hidden){ pr.style.bottom=botH+'px'; extra=(pr.firstChild.offsetHeight||0)+14; }
+  const ck=$id('chk'); if(ck&&!ck.hidden){ ck.style.bottom=(botH+12)+'px'; if(mob) extra=Math.max(extra,(ck.offsetHeight||0)+16); }
+  extra=Math.min(extra,Math.max(0,hh0-cardH-botH-150));
+  if(S.stage<=3){ resize3D(cardH+4,botH+extra,mob?0:240); const hh=$id('rotHint'); if(hh){ hh.style.bottom='auto'; hh.style.top=(mob?cardH+56:cardH+12)+'px'; } }
+  const gp=$id('graph3'); if(gp) gp.style.top=mob?(cardH+58)+'px':'84px';
+  const sc=$id('sceneC'); if(sc){ sc.style.paddingTop=mob?(cardH+10)+'px':''; sc.style.paddingBottom=(botH+16)+'px'; }
+}
+function render(){
+  const items=[panelA,panelB,panelT,panelR,panelK][S.stage]();
+  fillCard(items); layoutScenes(); drawTabs(); lockSteps(); syncFtb();
+}
+function syncFtb(){
+  const rh=$id('rotHint'); if(rh&&S.stage>=1&&S.stage<=3){ rh.textContent=dragSpec()?'✋ Kéo vật đang nhấp nháy thả vào vòng vàng · Kéo vào chỗ trống: xoay bàn':'🖐 Kéo: xoay · Chuột phải / Shift + kéo: di chuyển · Cuộn: phóng to'; if(dragSpec()) rh.style.opacity='1'; }
+  const r=$id('ftReset'), l=$id('ftLoc'); if(r) r.hidden=S.stage===4; if(l) l.hidden=S.stage===4; syncCam();
+}
+function showScene(i){
+  ['stg0','stg1','stg2','stg3','stg4'].forEach(c=>document.body.classList.toggle(c,c==='stg'+i));
+  $id('sceneB').hidden=i>3; $id('sceneC').hidden=i!==4;
+  view.className='view s'+i;
+}
+/* vào một bước: đặt lại trạng thái vật, camera, các hộp thoại */
+function enterStage(i){
+  if(!B3.ready) return;
+  const show=(id,on)=>{ const e=$id(id); if(e) e.hidden=!on; };
+  if(i<=1){ resetE(); resetR(); }
+  else if(i===2){ resetE(); resetR(); }
+  else if(i===3){
+    if(R.done>=3) resetR();
+    boardToTray(); SIM.boardIn=false; setLamp(true,true); showClock(true);
+  } else { setLamp(false,true); setThermal(false,true); fxStop(); hideAllTags(); }
+  B3.camKey=i===0?'all':(i===3&&R.phase==='silver')?'wide':(i===3&&R.phase!=='check')?'cmp':'rig'; B3.userTouched=false;
+  show('predict',i===1); show('graph3',i===2||i===3); show('chip3',i===2||i===3);
+  updateChk(); syncCam();
+  if(i===0){ Object.keys(tray).forEach(k=>delete tray[k]); lastPick=null; L3.forEach(l=>l.el&&l.el.classList.remove('got')); }
+}
+function resetCurrent(){
+  if(S.stage===0){ Object.keys(tray).forEach(k=>delete tray[k]); lastPick=null; S.miss=false; if(B3.zoomId) zoomOut(); L3.forEach(l=>l.el&&l.el.classList.remove('got')); const tp=$id('ttip'); if(tp) tp.hidden=true; }
+  else if(S.stage===1){ S.predict=null; }
+  else if(S.stage===2){ resetE(); resetR(); showClock(false); toast('Đã làm lại từ đầu'); }
+  else if(S.stage===3){ resetR(); boardToTray(); SIM.boardIn=false; resetSim(); setLamp(true,true); B3.camKey='rig'; B3.userTouched=false; toast('Đã làm lại bước 4'); }
+  else return;
+  beep(true); lastKey=''; render();
+}
+function toggleCam(){ if(S.stage!==3) return; setThermal(B3.thermalWant<.5); lastKey=''; render(); }
+const visited=new Set();
+let railX=0, justSwiped=false;
+function drawTabs(){
+  const el=$id('stageTabs'); if(!el) return;
+  el.innerHTML=STAGES.map((s,i)=>{ const lock=!canGo(i), done=visited.has(i)&&i!==S.stage; return `<button type="button" class="stab${i===S.stage?' on':''}${done?' done':''}${lock?' lock':''}" data-i="${i}"><i>${lock?'🔒':done?'✓':i+1}</i>${s.tab}</button>`; }).join('');
+  el.querySelectorAll('.stab').forEach(b=>b.onclick=()=>gotoStage(+b.dataset.i));
+  if(window.innerWidth>=761){ const on=el.querySelector('.stab.on'); if(on) on.after(CARD); }
+  else if(CARD.parentNode===el||CARD.parentNode===null) CARD_HOME.p.insertBefore(CARD,CARD_HOME.n);
+}
+const CARD=$id('card'), CARD_HOME={p:CARD.parentNode,n:CARD.nextSibling};
+function lockSteps(){
+  STAGES.forEach((s,i)=>{ const b=$id('step'+i); if(b) b.classList.toggle('lock',!canGo(i)); });
+  const sn=$id('sideNext'); if(sn) sn.disabled=S.stage>=STAGES.length-1||!canGo(S.stage+1);
+}
+function renderSteps(){ drawTabs();
+  const n=$id('stepsTrack'); n.innerHTML='';
+  STAGES.forEach((s,i)=>{ const b=document.createElement('button'); b.className='step'+(i===S.stage?' active':'')+(visited.has(i)&&i!==S.stage?' done':''); b.id='step'+i; b.innerHTML=`<span class="num">${i+1}</span><span>${s.short}</span>`; b.onclick=()=>{ if(!justSwiped) gotoStage(i); }; n.appendChild(b); });
+  const sp=$id('sidePrev'), sn=$id('sideNext'); if(sp){ sp.disabled=S.stage===0; sn.disabled=S.stage===STAGES.length-1; }
+  lockSteps(); centerSteps();
+}
+function setRail(x,anim){ const rail=$id('steps'), tr=$id('stepsTrack'), max=Math.max(0,tr.scrollWidth-rail.clientWidth); railX=clamp(x,-max,0); tr.style.transition=anim?'':'none'; tr.style.transform=`translateX(${railX}px)`; }
+function centerSteps(){ const rail=$id('steps'), tr=$id('stepsTrack'), b=$id('step'+S.stage); if(!b) return; if(tr.scrollWidth<=rail.clientWidth){ setRail(0,true); return; } setRail(-(b.offsetLeft+b.offsetWidth/2-rail.clientWidth/2),true); }
+(function(){ const rail=$id('steps'); let pid=null,sx=0,st=0,moved=false;
+  rail.addEventListener('pointerdown',e=>{ pid=e.pointerId; sx=e.clientX; st=railX; moved=false; });
+  rail.addEventListener('pointermove',e=>{ if(pid!==e.pointerId) return; const dx=e.clientX-sx; if(!moved){ if(Math.abs(dx)<6) return; moved=true; rail.classList.add('dragging'); rail.setPointerCapture(pid); } setRail(st+dx,false); });
+  const end=e=>{ if(pid!==e.pointerId) return; pid=null; rail.classList.remove('dragging'); if(moved){ justSwiped=true; setTimeout(()=>justSwiped=false,300); } };
+  rail.addEventListener('pointerup',end); rail.addEventListener('pointercancel',end); })();
+(function(){ const vw=$id('viewer'); [['prev','sidePrev','‹','Bước trước',-1],['next','sideNext','›','Bước tiếp theo',1]].forEach(([c,id,ch,lab,d])=>{ const b=document.createElement('button'); b.className='side-nav '+c; b.id=id; b.setAttribute('aria-label',lab); b.title=lab; b.textContent=ch; b.disabled=true; b.onclick=()=>gotoStage(S.stage+d); vw.appendChild(b); }); })();
+window.addEventListener('resize',()=>{ centerSteps(); layoutScenes(); drawTabs(); }); new ResizeObserver(()=>layoutScenes()).observe($id('bottom')); new ResizeObserver(()=>layoutScenes()).observe($id('card'));
+function gotoStage(i){
+  i=clamp(i,0,STAGES.length-1);
+  if(!canGo(i)){ beep(false); toast(LOCKMSG[i]); return; }
+  if(S.active&&i!==S.stage) visited.add(S.stage);
+  stopSpeak(); S.stage=i; S.lastSay=null; S.lastVk=null; lastKey='';
+  { const lb=$id('lbl3'); if(lb){ lb.classList.toggle('numonly',i===0); L3.forEach(l=>l.w=0); } const tp=$id('ttip'); if(tp) tp.hidden=true; B3.hintId=null; if(B3.zoomId) zoomOut();
+    B3.showLbl=(i===0); const lbb=$id('lblBtn'); if(lbb){ lbb.textContent=B3.showLbl?'📍 Ẩn ghi chú':'📍 Hiện ghi chú'; lbb.setAttribute('aria-pressed',B3.showLbl); lbb.classList.toggle('off',!B3.showLbl); } }
+  if(i===4) buildK();
+  showScene(i); enterStage(i); renderSteps(); render();
+}
+document.addEventListener('click',e=>{
+  const vsEl=e.target.closest('.csteps .vs'); if(vsEl&&(S.stage===2||S.stage===3)){ B3.hintT=performance.now()+3500; return; }
+  const b=e.target.closest('button[data-act]'); if(!b||b.disabled) return;
+  const a=b.dataset.act;
+  switch(a){
+    case 'say': if(S.lastSay||S.lastVk) speak(S.lastSay,true,S.lastVk); break;
+    case 'next': gotoStage(S.stage+1); break;
+    case 'review': gotoStage(3); break;
+    case 'hint1': hintTool(false); break;
+    case 'hint3d': B3.hintT=performance.now()+3500; break;
+    case 'speed': S.speed=S.speed===1?3:1; lastKey=''; render(); break;
+    case 'pred': S.predict=b.dataset.k; sfx('click'); lastKey=''; render(); break;
+    case 'chk': cardClick(b.dataset.k); break;
+    case 'goSilver': goSilver(); break;
+    case 'restart': Object.keys(tray).forEach(k=>delete tray[k]); lastPick=null; S.predict=null; S.played={}; S.ok=[false,false,false,false,false]; S.miss=false; S.speed=1; visited.clear(); resetE(); resetR(); L3.forEach(l=>l.el&&l.el.classList.remove('got')); gotoStage(0); break;
+  }
+});
+$id('sound').onclick=()=>{ S.narr=!S.narr; $id('sound').innerHTML=S.narr?'<span class="ic">🔊</span><span class="tx"> Âm thanh</span>':'<span class="ic">🔇</span><span class="tx"> Tắt tiếng</span>'; const ft=$id('ftSound'); if(ft) ft.classList.toggle('off',!S.narr); if(!S.narr) stopSpeak(); setHum(HUM.want); };
+$id('view').insertAdjacentHTML('beforeend',`<div class="ftb" id="ftb">
+  <button type="button" id="ftFull" aria-label="Toàn màn hình" title="Toàn màn hình"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <button type="button" id="ftReset" aria-label="Làm lại" title="Làm lại"><svg viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4v4.5H8"/></svg></button>
+  <i class="sep"></i>
+  <button type="button" id="ftLoc" aria-label="Ẩn/hiện ghi chú" title="Ẩn/hiện ghi chú"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg></button>
+  <button type="button" id="ftCam" aria-label="Camera tia nhiệt" title="Camera tia nhiệt" hidden><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.4"/></svg></button>
+  <button type="button" id="ftSound" aria-label="Âm thanh" title="Âm thanh"><svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5zM15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg></button></div>`);
+$id('ftFull').onclick=()=>$id('full').click();
+$id('ftSound').onclick=()=>$id('sound').click();
+$id('ftLoc').onclick=()=>{ $id('lblBtn').click(); };
+$id('ftReset').onclick=()=>resetCurrent();
+$id('ftCam').onclick=()=>toggleCam();
+document.addEventListener('click',e=>{ if(S.stage!==0) return; const d=e.target.closest('#lbl3 .n3'), l=d&&L3.find(x=>x.el===d); if(l) viewObj(l.id); });
+document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&S.stage===0){ const d=e.target.closest&&e.target.closest('#lbl3 .n3'); if(d){ const l=L3.find(x=>x.el===d); if(l){ e.preventDefault(); viewObj(l.id); } } } });
+$id('full').onclick=()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(()=>{}); else document.exitFullscreen?.().catch(()=>{}); };
+document.addEventListener('visibilitychange',()=>{ B3.last=null; if(document.hidden){ const w=HUM.want; setHum(false); HUM.want=w; } else setHum(HUM.want); });
+
+/* ===== MỞ ĐẦU ===== */
+function speakMo(){ S.vok=0; speak(null,true,'mo'); }
+function startLesson(){
+  const cv=$id('introScreen'); S.moDone=true; stopSpeak(); if(cv){ cv.classList.add('leaving'); setTimeout(()=>cv.remove(),480); } document.body.classList.remove('intro-active');
+  S.active=true; visited.clear(); gotoStage(0);
+}
+(function(){ let s='', r=rng(5); for(let i=0;i<14;i++){ const z=40+r()*90; s+=`<i style="left:${(r()*100).toFixed(1)}%;top:${(r()*100).toFixed(1)}%;width:${z.toFixed(0)}px;height:${z.toFixed(0)}px;--dx:${((r()-.5)*90).toFixed(0)}px;--dy:${((r()-.5)*70).toFixed(0)}px;animation-duration:${(9+r()*10).toFixed(1)}s;animation-delay:-${(r()*14).toFixed(1)}s"></i>`; } $id('gcells').innerHTML=s; })();
+$id('goBtn').addEventListener('click',startLesson);
+$id('moBtn').addEventListener('click',e=>{ e.stopPropagation(); speakMo(); });
+/* màn mở đầu không tự phát tiếng: giọng đọc chỉ chạy từ lúc bấm «Bắt đầu thực hành» (bước 1) */
+buildB();
+function buildB(){ init3D(); }
+const q=new URLSearchParams(location.search);
+if(q.has('step')){ const n=clamp(+q.get('step')||0,0,4); startLesson(); S.ok=[true,true,true,true,true]; if(n>=2) S.predict='C'; gotoStage(n); }
+if(DEBUG) window.LAB={loop3D,B3,S,E,R,SIM,onPick,gotoStage,render,MD,tray,startLesson,setLamp,setThermal,cardClick,goSilver,placeSilver,dropDone,boardToTray,resetE,resetR,THREE};
+</script>
+</body>
+</html>
+

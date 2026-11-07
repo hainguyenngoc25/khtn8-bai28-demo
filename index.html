@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KHTN 8 – Bài 28. Sự truyền nhiệt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:Roboto,"Segoe UI",Arial,sans-serif;color:#fff;
+  background:linear-gradient(180deg,#0f131a 0%,#2a2f38 50%,#6b717b 100%) fixed;
+  min-height:100vh;overflow-y:auto;
+}
+.card{
+  width:min(550px,92vw);margin:36px auto;padding:18px;
+  border-radius:28px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;gap:18px;
+}
+button,a{font-family:inherit;color:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid rgba(255,255,255,.6);outline-offset:2px}
+
+.blk{
+  background:rgba(255,255,255,.17);border-radius:37px;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:background .3s,border-radius .3s;overflow:hidden;
+}
+.blk:hover{background:rgba(255,255,255,.23)}
+.blk.open{border-radius:28px}
+.hd{
+  display:flex;align-items:center;gap:10px;width:100%;height:74px;
+  padding:0 20px 0 28px;border:0;background:none;cursor:pointer;
+  text-align:left;text-decoration:none;text-transform:uppercase;font-weight:700;font-size:22px;
+}
+.blk.open .hd{height:auto;min-height:56px;padding:18px 20px 4px 18px}
+.blk:not(.has-kids) .hd{padding-left:28px}
+.chev{width:14px;height:14px;flex:none;transition:transform .3s;transform:rotate(-90deg);display:none}
+.has-kids .chev{display:block}
+.blk.open .chev{transform:rotate(0)}
+.body{max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .3s ease}
+.blk.open .body{opacity:1}
+.inner{padding:4px 12px 14px}
+.grp+.grp{margin-top:8px}
+.gt{font-weight:700;font-size:19px;opacity:.95;padding:14px 18px 4px 30px}
+.item{
+  position:relative;display:flex;align-items:center;gap:16px;min-height:64px;
+  padding:8px 14px 8px 30px;margin:0;text-decoration:none;font-size:21px;
+  border-radius:14px;transition:background .2s;
+}
+.item:hover{background:rgba(255,255,255,.08)}
+.item+.item::before{
+  content:"";position:absolute;top:0;left:14px;right:14px;height:1px;background:rgba(255,255,255,.14);
+}
+.item:hover::before,.item:hover+.item::before{opacity:0}
+.star{width:18px;height:18px;flex:none;transition:transform .25s,filter .25s}
+.item:hover .star{transform:rotate(45deg);filter:drop-shadow(0 0 5px #fff)}
+.txt{flex:1}
+.ck{display:none;font-size:16px;color:#7fe0c4;flex:none}
+.item.visited .ck{display:inline}
+.item.done .ck{font-weight:900;font-size:19px;text-shadow:0 0 8px #7fe0c4,0 0 14px rgba(127,224,196,.7)}
+
+/* viewer */
+#viewer{
+  position:fixed;inset:0;z-index:100;background:#11161d;display:flex;flex-direction:column;
+  transform:translateY(100%);visibility:hidden;transition:transform .3s ease,visibility 0s .3s;
+}
+#viewer.show{transform:translateY(0);visibility:visible;transition:transform .3s ease}
+.vbar{height:52px;flex:none;background:#11161d;display:flex;align-items:center;padding:0 12px;gap:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.back{
+  flex:none;background:none;border:1px solid rgba(255,255,255,.3);border-radius:999px;
+  padding:6px 14px;font-size:15px;cursor:pointer;
+}
+.back:hover{background:rgba(255,255,255,.1)}
+.vt{position:absolute;left:0;right:0;text-align:center;padding:0 130px;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.vbar{position:relative}
+#frame{flex:1;width:100%;border:0;background:#fff}
+
+@media (max-width:479px){
+  .hd{font-size:18px;height:62px}
+  .item{font-size:17px}
+  .gt{font-size:17px}
+  .vt{padding:0 100px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<main class="card" id="menu"></main>
+
+<div id="viewer" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="vbar">
+    <button class="back" id="back" type="button">‹ Mục lục</button>
+    <div class="vt" id="vt"></div>
+  </div>
+  <iframe id="frame" allow="autoplay; fullscreen" allowfullscreen title="Học liệu"></iframe>
+</div>
+
+<script>
+const MENU = [
+  { id:"I",   title:"I. KHỞI ĐỘNG",            file:"1. Khởi động.html" },
+  { id:"II",  title:"II. HÌNH THÀNH KIẾN THỨC", open:true, groups:[
+      { title:"2.1. Dẫn nhiệt", items:[
+          { title:"2.1.1. Khám phá hiện tượng dẫn nhiệt",       file:"2. Khám phá hiện tượng dẫn nhiệt.html" },
+          { title:"2.1.2. Vật dẫn nhiệt tốt, vật cách nhiệt tốt", file:"3. Vật dẫn nhiệt tốt, vật cách nhiệt tốt.html" } ]},
+      { title:"2.2. Đối lưu", items:[
+          { title:"2.2.1. Đối lưu trong chất lỏng", file:"4. Đối lưu trong chất lỏng.html" },
+          { title:"2.2.2. Đối lưu trong chất khí",  file:"5. Đối lưu trong chất khí.html" } ]},
+      { title:"2.3. Bức xạ nhiệt", items:[
+          { title:"2.3.1. Khám phá bức xạ nhiệt", file:"6. Khám phá bức xạ nhiệt.html" },
+          { title:"2.3.2. Hiệu ứng nhà kính",     file:"7. Hiệu ứng nhà kính.html" } ]}
+  ]},
+  { id:"III", title:"III. LUYỆN TẬP", groups:[
+      { items:[
+          { title:"3.1. Quiz luyện tập",           file:"8. Luyện tập.html" },
+          { title:"3.2. Trò chơi: Que kem về nhà", file:"9. Trò chơi_ Que kem về nhà.html" } ]}
+  ]},
+  { id:"IV",  title:"IV. MỞ RỘNG",             file:"10. Mở rộng.html" }
+];
+const OPEN_MODE = "viewer"; // "viewer" | "self" | "tab"
+
+const KEY_V = "kh8b28_visited", KEY_D = "kh8b28_done";
+const $ = (s, r) => (r || document).querySelector(s);
+function load(k){ try{ const a = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(a) ? a : []; }catch(e){ return []; } }
+function save(k, a){ try{ localStorage.setItem(k, JSON.stringify(a)); }catch(e){} }
+let visited = load(KEY_V), done = load(KEY_D);
+
+const STAR = '<svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 1.5c.6 5.6 4.9 9.9 10.5 10.5-5.6.6-9.9 4.9-10.5 10.5C11.4 16.9 7.1 12.6 1.5 12 7.1 11.4 11.4 7.1 12 1.5z"/></svg>';
+const CHEV = '<svg class="chev" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 4.5 7 9l4.5-4.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const href = f => encodeURIComponent(f);
+
+const items = {};  // file -> item
+const menuEl = $("#menu");
+
+function itemHTML(it){
+  items[it.file] = it;
+  return '<a class="item" href="'+href(it.file)+'" data-file="'+esc(it.file)+'">'+STAR+
+         '<span class="txt">'+esc(it.title)+'</span><span class="ck" aria-label="đã mở">✓</span></a>';
+}
+menuEl.innerHTML = MENU.map(m => {
+  const kids = !!m.groups;
+  let h = '<section class="blk'+(kids?' has-kids':'')+(m.open?' open':'')+'" data-id="'+m.id+'">';
+  if(kids){
+    h += '<button class="hd" type="button" aria-expanded="'+(!!m.open)+'">'+CHEV+'<span>'+esc(m.title)+'</span></button>';
+    h += '<div class="body"><div class="inner">' + m.groups.map(g =>
+      '<div class="grp">'+(g.title?'<div class="gt">'+esc(g.title)+'</div>':'')+g.items.map(itemHTML).join('')+'</div>').join('') +
+      '</div></div>';
+  } else {
+    items[m.file] = m;
+    h += '<a class="hd" href="'+href(m.file)+'" data-file="'+esc(m.file)+'">'+esc(m.title)+'</a>';
+  }
+  return h + '</section>';
+}).join('');
+
+function refreshMarks(){
+  menuEl.querySelectorAll(".item").forEach(a => {
+    const f = a.dataset.file;
+    a.classList.toggle("visited", visited.indexOf(f) >= 0);
+    a.classList.toggle("done", done.indexOf(f) >= 0);
+  });
+}
+refreshMarks();
+
+/* accordion */
+function fit(b){ const body = $(".body", b); if(body) body.style.maxHeight = b.classList.contains("open") ? body.scrollHeight + "px" : "0px"; }
+function setOpen(b, open){
+  b.classList.toggle("open", open);
+  const hd = $(".hd", b); if(hd) hd.setAttribute("aria-expanded", open);
+  fit(b);
+}
+const kidBlocks = [...menuEl.querySelectorAll(".blk.has-kids")];
+kidBlocks.forEach(b => {
+  fit(b);
+  $(".hd", b).addEventListener("click", () => {
+    const willOpen = !b.classList.contains("open");
+    kidBlocks.forEach(o => setOpen(o, o === b ? willOpen : false));
+  });
+});
+window.addEventListener("resize", () => kidBlocks.forEach(fit));
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => kidBlocks.forEach(fit));
+
+/* open items */
+menuEl.addEventListener("click", e => {
+  const a = e.target.closest("a[data-file]");
+  if(!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  const it = items[a.dataset.file];
+  if(!it) return;
+  e.preventDefault();
+  openItem(it);
+});
+
+const viewer = $("#viewer"), frame = $("#frame");
+let current = null, pushed = false;
+
+function markVisited(f){
+  if(visited.indexOf(f) < 0){ visited.push(f); save(KEY_V, visited); }
+  refreshMarks();
+}
+function openItem(it){
+  markVisited(it.file);
+  const url = href(it.file);
+  if(OPEN_MODE === "self"){ location.href = url; return; }
+  if(OPEN_MODE === "tab"){ window.open(url, "_blank"); return; }
+  current = it;
+  $("#vt").textContent = it.title.replace(/^[\d.]+\s*/, "").replace(/^[IV]+\.\s*/, "");
+  frame.src = url;
+  viewer.classList.add("show");
+  viewer.setAttribute("aria-hidden", "false");
+  try{ history.pushState({kh8b28:1}, ""); pushed = true; }catch(e){ pushed = false; }
+  setTimeout(() => { try{ $("#back").focus(); }catch(e){} }, 0);
+}
+function hideViewer(){
+  if(!viewer.classList.contains("show")) return;
+  viewer.classList.remove("show");
+  viewer.setAttribute("aria-hidden", "true");
+  frame.src = "about:blank";
+  current = null;
+}
+function closeViewer(){
+  if(!viewer.classList.contains("show")) return;
+  if(pushed){ pushed = false; try{ history.back(); return; }catch(e){} }
+  hideViewer();
+}
+$("#back").addEventListener("click", closeViewer);
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeViewer(); });
+window.addEventListener("popstate", () => { pushed = false; hideViewer(); });
+
+/* completion signal */
+window.addEventListener("message", e => {
+  if(!current || e.source !== frame.contentWindow) return;
+  const d = e.data; if(!d) return;
+  let ok = false;
+  try{
+    if(typeof d === "string") ok = /complete|done/i.test(d);
+    else{
+      const t = String(d.type || "");
+      ok = /complete|done/i.test(t) || d.status === "completed";
+    }
+  }catch(err){}
+  if(ok){
+    if(done.indexOf(current.file) < 0){ done.push(current.file); save(KEY_D, done); }
+    markVisited(current.file);
+    refreshMarks();
+  }
+});
+</script>
+</body>
+</html>

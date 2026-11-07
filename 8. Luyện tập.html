@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sự truyền nhiệt – Luyện tập</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:#195658;font-family:Roboto,"Segoe UI",Arial,"Helvetica Neue",sans-serif;color:#10302d;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #e7ac4f;outline-offset:2px}
+
+/* Header */
+.top{flex:0 0 72px;height:72px;background:#fff;border-bottom:1px solid #dbe8e5;display:flex;align-items:center;gap:16px;padding:0 20px}
+.logo{height:36px;display:block}
+.vsep{width:1px;height:36px;background:#dbe8e5}
+.ttl{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.chip-s{align-self:flex-start;background:#e6f0ee;color:#195658;font-size:12px;font-weight:700;padding:2px 10px;border-radius:999px;line-height:1.4}
+.ttl h1{font-size:20px;font-weight:700;color:#10302d;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs{flex:0 0 42px;width:42px;height:42px;border-radius:10px;border:1px solid #dbe8e5;background:#fff;display:grid;place-items:center;color:#195658}
+.fs:hover{border-color:#2f827d}
+
+/* Main */
+.main{flex:1;min-height:0;padding:16px}
+.frame{position:relative;height:100%;background:linear-gradient(180deg,#fff 0%,#fff 55%,#f1f9f7 100%);border-radius:24px;box-shadow:0 8px 30px rgba(0,0,0,.18);display:flex;flex-direction:column;padding:16px 76px 20px;gap:14px;min-height:0}
+.row1{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto}
+.chip{background:#e6f0ee;color:#195658;font-size:13px;font-weight:700;letter-spacing:.08em;padding:6px 14px;border-radius:999px}
+.segs{display:flex;gap:6px;align-items:center}
+.seg{width:34px;height:7px;border-radius:99px;background:#dbe8e5;transition:width .25s,background .25s}
+.seg.ok{background:#2e9d5b}.seg.bad{background:#e0a21b}.seg.cur{background:#2e9d5b;width:68px}
+.seg.cur.bad{background:#e0a21b}
+
+.card{flex:1;min-height:0;border:1px solid #e3ece9;border-radius:20px;background:#fff;padding:clamp(16px,3vh,32px) clamp(20px,5vw,96px);display:flex;flex-direction:column;gap:clamp(8px,1.6vh,18px);overflow:hidden}
+.body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.6vh,18px);overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#9fb3b0 transparent}
+.body::-webkit-scrollbar{width:6px}.body::-webkit-scrollbar-thumb{background:#9fb3b0;border-radius:6px}
+.card.res-card{overflow-y:auto}
+.qno{font-size:clamp(14px,1.2vw,16px);font-weight:700;letter-spacing:.12em;color:#5f8b89;flex:0 0 auto}
+.q{font-weight:800;color:#10302d;font-size:var(--qfs,clamp(24px,3.1vw,50px));line-height:1.25;flex:0 0 auto}
+.hint{font-size:clamp(14px,1.2vw,19px);color:#5f8b89;flex:0 0 auto}
+.fig{flex:0 0 auto;max-height:30vh;display:flex;flex-direction:column;gap:6px;min-height:0}
+.figw{overflow:auto;max-width:100%;border:1px solid #dbe8e5;border-radius:12px}
+.fig table{border-collapse:collapse;width:100%;font-size:clamp(13px,1.1vw,18px);min-width:560px}
+.fig th,.fig td{padding:8px 12px;text-align:center;border-left:1px solid #dbe8e5;white-space:nowrap}
+.fig th:first-child,.fig td:first-child{border-left:0;text-align:left;font-weight:700}
+.fig tr:first-child th{background:#f4f8f3;font-weight:700}
+.fig tr:last-child td{border-top:1px solid #dbe8e5}
+.fig .hl{background:#fff6d6!important}
+.fig figcaption{font-size:clamp(12px,.95vw,15px);color:#5f8b89}
+
+.answers{flex:1 0 auto;display:flex;flex-direction:column;gap:clamp(8px,1.4vh,14px)}
+.fig{max-height:24vh}
+.ans{flex:1 0 auto;max-height:140px;width:100%;min-height:clamp(56px,9vh,96px);display:flex;align-items:center;gap:16px;text-align:left;background:#fff;border:1.5px solid #dbe8e5;border-radius:16px;padding:8px 18px;transition:border-color .15s,transform .15s,background .15s;color:#10302d}
+.ans:hover{border-color:#2f827d;transform:translateY(-1px)}
+.lt{flex:0 0 auto;width:clamp(36px,3.2vw,46px);height:clamp(36px,3.2vw,46px);border-radius:50%;background:#eef3f2;color:#173c3b;font-weight:900;font-size:clamp(16px,1.5vw,22px);display:grid;place-items:center}
+.tx{font-size:var(--afs,clamp(18px,1.9vw,30px));font-weight:500;line-height:1.3}
+.card.locked .ans{cursor:default}
+.card.locked .ans:hover{transform:none;border-color:#dbe8e5}
+.ans.ok,.card.locked .ans.ok:hover{background:#e6f5ec;border-color:#2e9d5b}
+.ans.ok .lt{background:#2e9d5b;color:#fff}
+.ans.bad,.card.locked .ans.bad:hover{background:#fdecea;border-color:#d9534f}
+.ans.bad .lt{background:#d9534f;color:#fff}
+.ans.shake{animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+
+.foot{flex:0 0 auto;display:flex;align-items:center;gap:16px;min-height:56px;}
+.fb{flex:1;border-radius:12px;padding:10px 16px;font-size:clamp(15px,1.35vw,21px);font-weight:700;line-height:1.4;display:none}
+.fb.show{display:block;animation:up .25s}
+.fb.good{background:#e6f5ec;color:#1f7a45}
+.fb.wrong{background:#fff4e0;color:#9a5b00}
+.next{margin-left:auto;flex:0 0 auto;height:56px;padding:0 30px;border:0;border-radius:999px;background:#195658;color:#fff;font-size:18px;font-weight:700;box-shadow:0 6px 16px rgba(25,86,88,.35);visibility:hidden}
+.next.show{visibility:visible;animation:up .25s}
+.next:hover{background:#1d6a6c}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.arr{position:absolute;top:50%;margin-top:-24px;width:48px;height:48px;border-radius:50%;border:0;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.2);color:#195658;font-size:20px;display:grid;place-items:center;z-index:3;transition:opacity .2s}
+.arr.l{left:14px}.arr.r{right:14px}
+.arr:disabled{opacity:.35;cursor:default}
+.arr:not(:disabled):hover{background:#e6f0ee}
+
+/* Results */
+.res{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.ring{position:relative;width:min(220px,30vh);height:min(220px,30vh);min-width:150px;min-height:150px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(36px,5vw,56px);font-weight:900;color:#10302d}
+.stars{font-size:34px;letter-spacing:6px;color:#e0a21b}
+.stars .off{color:#dbe8e5}
+.msg{font-size:clamp(18px,1.8vw,26px);font-weight:700;color:#10302d}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chips span{background:#e6f0ee;color:#195658;font-weight:700;padding:6px 14px;border-radius:999px;font-size:clamp(14px,1.2vw,17px)}
+.rev{width:100%;display:flex;flex-direction:column;gap:6px;text-align:left}
+.rev h3{font-size:16px;color:#5f8b89;letter-spacing:.08em;margin-top:6px}
+.ri{border:1px solid #dbe8e5;border-radius:12px;overflow:hidden}
+.rh{width:100%;display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff;border:0;text-align:left;font-size:16px;color:#10302d}
+.rh:hover{background:#f4f8f7}
+.rn{font-weight:900;color:#5f8b89;flex:0 0 auto}
+.rq{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.ric{font-weight:900;font-size:18px}
+.ric.ok{color:#2e9d5b}.ric.bad{color:#d9534f}
+.rb{display:none;padding:4px 14px 12px 44px;font-size:15px;line-height:1.5;color:#173c3b}
+.ri.open .rb{display:block}
+.rb b{color:#1f7a45}
+.again{height:52px;padding:0 28px;border:0;border-radius:999px;background:#195658;color:#fff;font-size:17px;font-weight:700;box-shadow:0 6px 16px rgba(25,86,88,.35);margin:8px 0 4px}
+
+@media (max-width:760px){
+ .top{padding:0 12px;gap:10px}.vsep{display:none}.ttl h1{font-size:15px}.logo{height:30px}
+ .main{padding:8px}
+ .frame{padding:12px 12px 14px;border-radius:20px}
+ .arr{width:40px;height:40px;margin-top:-20px;font-size:17px}
+ .arr.l{left:2px}.arr.r{right:2px}
+ .seg{width:16px;gap:4px}.seg.cur{width:32px}.segs{gap:4px}
+ .card{padding:16px 18px}
+ .foot{flex-wrap:wrap}.next{width:100%}
+ .ans{padding:8px 12px;gap:12px}
+}
+@media (max-width:760px) and (orientation:landscape){.next{width:auto}}
+@media (prefers-reduced-motion:reduce){.ans.shake,.fb.show,.next.show{animation:none}.ans,.seg,.arr{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+ <img class="logo" style="height:36px" alt="YooBook" src="data:image/png;base64,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
+">
+ <div class="vsep"></div>
+ <div class="ttl"><span class="chip-s">Khoa học tự nhiên 8</span><h1>Sự truyền nhiệt – Luyện tập</h1></div>
+ <button class="fs" id="fs" aria-label="Toàn màn hình" title="Toàn màn hình"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+</header>
+<div class="main">
+ <div class="frame" id="frame">
+  <button class="arr l" id="prev" aria-label="Câu trước">◀</button>
+  <button class="arr r" id="nxt" aria-label="Câu sau">▶</button>
+  <div class="row1"><span class="chip">TRẮC NGHIỆM</span><div class="segs" id="segs" aria-hidden="true"></div></div>
+  <div class="card" id="card"></div>
+ </div>
+</div>
+
+<script>
+const QUIZ = [
+ { topic:'Dẫn nhiệt',
+   q:'Dẫn nhiệt là gì?',
+   a:['Sự truyền năng lượng trực tiếp từ các nguyên tử, phân tử có động năng lớn hơn sang các nguyên tử, phân tử có động năng nhỏ hơn thông qua va chạm',
+      'Sự truyền nhiệt nhờ các dòng chất lỏng hoặc chất khí di chuyển',
+      'Sự truyền năng lượng bằng các tia nhiệt đi thẳng',
+      'Sự di chuyển của các nguyên tử từ chỗ nóng sang chỗ lạnh'],
+   ok:0,
+   why:'Trong dẫn nhiệt, các hạt chỉ va chạm và truyền năng lượng cho nhau, chúng không di chuyển từ chỗ nóng sang chỗ lạnh.' },
+
+ { topic:'Dẫn nhiệt',
+   q:'Theo Bảng 28.1, đồng dẫn nhiệt tốt gấp khoảng bao nhiêu lần gỗ?',
+   figure:'table281',
+   a:['Khoảng 25 lần','Khoảng 250 lần','Khoảng 2 500 lần','Khoảng 25 000 lần'],
+   ok:2,
+   why:'Đồng: 17 370; gỗ: 7. Ta có 17 370 : 7 ≈ 2 481, tức khoảng 2 500 lần.' },
+
+ { topic:'Dẫn nhiệt',
+   q:'Sáng sớm, chạm tay vào chân bàn bằng sắt thấy lạnh hơn mặt bàn gỗ. Vì sao?',
+   a:['Sắt dẫn nhiệt tốt hơn gỗ nên lấy nhiệt từ tay nhanh hơn',
+      'Sắt luôn có nhiệt độ thấp hơn gỗ',
+      'Gỗ tự sinh ra nhiệt',
+      'Sắt nặng hơn gỗ'],
+   ok:0,
+   why:'Chân bàn sắt và mặt bàn gỗ có cùng nhiệt độ. Sắt dẫn nhiệt tốt nên nhiệt từ tay truyền sang sắt rất nhanh, vì vậy ta thấy lạnh hơn.' },
+
+ { topic:'Đối lưu',
+   q:'Đun nóng ở đáy nồi mà cả nồi nước đều nóng lên. Nhiệt truyền đi trong nước chủ yếu bằng cách nào?',
+   a:['Đối lưu','Dẫn nhiệt','Bức xạ nhiệt','Vì nước dẫn nhiệt rất tốt'],
+   ok:0,
+   why:'Nước ở đáy nóng lên, nở ra, nhẹ hơn nên đi lên; nước lạnh ở trên đi xuống thế chỗ, tạo thành dòng đối lưu. Nước dẫn nhiệt kém.' },
+
+ { topic:'Đối lưu',
+   q:'Vì sao máy điều hoà thường được lắp ở trên cao trong phòng?',
+   a:['Khí lạnh nặng hơn nên chìm xuống, tạo dòng đối lưu làm mát cả phòng',
+      'Khí lạnh nhẹ hơn nên bay lên trần',
+      'Để máy được làm lạnh nhanh hơn',
+      'Vì ở trên cao không khí dẫn nhiệt tốt hơn'],
+   ok:0,
+   why:'Khí lạnh do máy thổi ra nặng hơn nên đi xuống, khí nóng nhẹ hơn bị đẩy lên. Dòng đối lưu này làm cả phòng mát đều.' },
+
+ { topic:'Bức xạ nhiệt',
+   q:'Giữa Mặt Trời và Trái Đất là chân không. Năng lượng từ Mặt Trời truyền tới Trái Đất bằng cách nào?',
+   a:['Bức xạ nhiệt','Dẫn nhiệt','Đối lưu','Cả dẫn nhiệt và đối lưu'],
+   ok:0,
+   why:'Dẫn nhiệt và đối lưu đều cần có các hạt vật chất. Chỉ tia nhiệt mới truyền được trong chân không, đó là bức xạ nhiệt.' },
+
+ { topic:'Bức xạ nhiệt',
+   q:'Đứng gần một bếp lửa, ta cảm thấy nóng. Nhiệt từ bếp truyền tới cơ thể chủ yếu bằng cách nào?',
+   a:['Bức xạ nhiệt','Dẫn nhiệt','Đối lưu','Cả ba cách như nhau'],
+   ok:0,
+   why:'Không khí dẫn nhiệt rất kém, còn khí nóng đi lên phía trên chứ không đi ngang tới người đứng cạnh. Nhiệt tới ta chủ yếu bằng bức xạ.' },
+
+ { topic:'Bức xạ nhiệt',
+   q:'Vì sao mùa hè người ta thường mặc áo màu trắng hoặc sáng màu?',
+   a:['Màu sáng phản xạ tia nhiệt mạnh nên áo ít bị nóng',
+      'Màu sáng hấp thụ tia nhiệt mạnh',
+      'Vải màu trắng dẫn nhiệt tốt hơn',
+      'Vải màu trắng tạo ra dòng đối lưu'],
+   ok:0,
+   why:'Mặt ngoài càng sáng màu, càng nhẵn thì phản xạ tia nhiệt càng mạnh. Màu sẫm thì hấp thụ tia nhiệt mạnh nên nóng hơn.' },
+
+ { topic:'Hiệu ứng nhà kính',
+   q:'Vì sao bên trong nhà kính trồng rau ấm hơn bên ngoài?',
+   a:['Bức xạ mạnh của Mặt Trời đi qua được kính, còn bức xạ yếu từ đất và cây bên trong bị kính giữ lại',
+      'Kính tự sinh ra nhiệt',
+      'Kính dẫn nhiệt tốt nên hút nhiệt từ bên ngoài vào',
+      'Cây trong nhà kính tỏa ra nhiều nhiệt hơn cây bên ngoài'],
+   ok:0,
+   why:'Bức xạ của Mặt Trời (khoảng 6 000 °C) mạnh nên xuyên qua kính; bức xạ của vật bên trong yếu nên không đi qua được kính và bị giữ lại. Đó là hiệu ứng nhà kính.' },
+
+ { topic:'Hiệu ứng nhà kính',
+   q:'Việc làm nào sau đây góp phần làm giảm hiệu ứng nhà kính?',
+   a:['Trồng nhiều cây xanh và đi xe đạp khi đi gần',
+      'Đốt rơm rạ sau mỗi vụ gặt',
+      'Để đèn, quạt bật khi ra khỏi phòng',
+      'Chặt cây để mở rộng đường đi'],
+   ok:0,
+   why:'Khí CO₂ đóng vai trò quan trọng nhất trong hiệu ứng nhà kính. Trồng cây xanh, đi xe đạp, tiết kiệm điện giúp giảm lượng CO₂ thải vào khí quyển.' }
+];
+const TOTAL = QUIZ.length;
+const TOPICS = ['Dẫn nhiệt','Đối lưu','Bức xạ nhiệt','Hiệu ứng nhà kính'];
+const LETTERS = ['A','B','C','D'];
+const TABLE281 = {
+  head:['Chất / vật liệu','Len','Gỗ','Nước','Thuỷ tinh','Đất','Thép','Nhôm','Đồng'],
+  row:['Khả năng dẫn nhiệt','2','7','25','44','65','2 860','8 770','17 370'],
+  hl:[2,8]
+};
+
+const $ = id => document.getElementById(id);
+const card = $('card'), segsEl = $('segs'), prevBtn = $('prev'), nxtBtn = $('nxt');
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let order = [], answers = [], cur = 0, showingResult = false, sent = false, countRaf = 0;
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function el(tag, cls, text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+
+function reset(){
+  order = QUIZ.map(q => shuffle(q.a.map((_,i)=>i)));
+  answers = QUIZ.map(()=>null);
+  cur = 0; showingResult = false; sent = false;
+}
+function score(){ return answers.filter(a=>a&&a.correct).length; }
+
+function renderSegs(){
+  segsEl.innerHTML = '';
+  for(let i=0;i<TOTAL;i++){
+    const s = el('span','seg');
+    const a = answers[i];
+    if(a) s.classList.add(a.correct?'ok':'bad');
+    if(i===cur && !showingResult) s.classList.add('cur');
+    segsEl.appendChild(s);
+  }
+}
+function updateArrows(){
+  if(showingResult){ prevBtn.disabled=false; nxtBtn.disabled=true; return; }
+  prevBtn.disabled = cur===0;
+  nxtBtn.disabled = !answers[cur];
+}
+
+function buildFigure(){
+  const fig = el('figure','fig');
+  const w = el('div','figw'); const t = el('table');
+  const r1 = el('tr'), r2 = el('tr');
+  TABLE281.head.forEach((h,i)=>{ const c=el('th',TABLE281.hl.includes(i)?'hl':'',h); c.scope = i? 'col':'row'; r1.appendChild(c); });
+  TABLE281.row.forEach((h,i)=>{ r2.appendChild(el('td',TABLE281.hl.includes(i)?'hl':'',h)); });
+  t.append(r1,r2); w.appendChild(t);
+  fig.append(w, el('figcaption','','Bảng 28.1 – Khả năng dẫn nhiệt so với không khí (không khí = 1)'));
+  return fig;
+}
+
+function render(){
+  cancelAnimationFrame(countRaf);
+  showingResult = false;
+  const d = QUIZ[cur], ans = answers[cur];
+  card.className = 'card' + (ans?' locked':'');
+  card.innerHTML = '';
+  const body = el('div','body');
+  card.style.removeProperty('--qfs'); card.style.removeProperty('--afs');
+  body.append(el('div','qno','CÂU '+(cur+1)+' / '+TOTAL));
+  body.append(el('h2','q',d.q));
+  body.append(el('div','hint','Chọn một đáp án đúng nhất.'));
+  if(d.figure==='table281') body.append(buildFigure());
+  const list = el('div','answers'); list.setAttribute('role','group'); list.setAttribute('aria-label','Các đáp án');
+  order[cur].forEach((orig,pos)=>{
+    const b = el('button','ans'); b.type='button'; b.dataset.pos = pos;
+    b.append(el('span','lt',LETTERS[pos]), el('span','tx',d.a[orig]));
+    b.addEventListener('click',()=>choose(pos));
+    list.appendChild(b);
+  });
+  body.append(list); card.append(body);
+  const foot = el('div','foot');
+  const fb = el('div','fb'); fb.id='fb'; fb.setAttribute('aria-live','polite');
+  const nb = el('button','next'); nb.type='button'; nb.id='nb';
+  nb.textContent = cur===TOTAL-1 ? 'Xem kết quả →' : 'Câu tiếp theo →';
+  nb.addEventListener('click',goNext);
+  foot.append(fb,nb); card.append(foot);
+  if(ans) applyAnswer(ans,false);
+  renderSegs(); updateArrows(); fitQuestion();
+}
+
+function applyAnswer(a, animate){
+  const d = QUIZ[cur];
+  const btns = card.querySelectorAll('.ans');
+  const okPos = order[cur].indexOf(d.ok);
+  card.classList.add('locked');
+  btns[okPos].classList.add('ok');
+  if(!a.correct){ btns[a.pos].classList.add('bad'); if(animate && !reduce) btns[a.pos].classList.add('shake'); }
+  const fb = $('fb');
+  fb.className = 'fb show ' + (a.correct?'good':'wrong');
+  if(!animate) fb.style.animation='none';
+  fb.textContent = (a.correct?'✓ Chính xác! ':'✗ Chưa đúng. ') + d.why;
+  const nb = $('nb'); nb.classList.add('show'); if(!animate) nb.style.animation='none';
+}
+
+function choose(pos){
+  if(showingResult || answers[cur]) return;
+  const d = QUIZ[cur];
+  const correct = order[cur][pos] === d.ok;
+  answers[cur] = {pos, correct};
+  applyAnswer(answers[cur], true);
+  renderSegs(); updateArrows(); fitQuestion();
+  const f = document.activeElement; if(f && f.classList.contains('ans')) f.blur();
+}
+
+function goNext(){
+  if(showingResult || !answers[cur]) return;
+  if(cur===TOTAL-1) showResult(); else { cur++; render(); }
+}
+function goPrev(){
+  if(showingResult){ cur=TOTAL-1; render(); return; }
+  if(cur>0){ cur--; render(); }
+}
+
+/* Fit text to the card */
+function fitQuestion(){
+  card.style.removeProperty('--qfs'); card.style.removeProperty('--afs');
+  const q = card.querySelector('.q'), tx = card.querySelector('.tx');
+  if(!q || !tx) return;
+  let qs = parseFloat(getComputedStyle(q).fontSize), as = parseFloat(getComputedStyle(tx).fontSize);
+  const bd = card.querySelector('.body'); const over = () => bd.scrollHeight > bd.clientHeight + 1;
+  let guard = 60;
+  while(over() && guard-- > 0){
+    let changed = false;
+    if(qs > 20){ qs = Math.max(20, qs-2); card.style.setProperty('--qfs', qs+'px'); changed = true; }
+    if(as > 16){ as = Math.max(16, as-2); card.style.setProperty('--afs', as+'px'); changed = true; }
+    if(!changed) break;
+  }
+}
+
+/* Results */
+function showResult(){
+  showingResult = true;
+  const s = score();
+  card.className = 'card res-card';
+  card.style.removeProperty('--qfs'); card.style.removeProperty('--afs');
+    card.innerHTML = '';
+  const res = el('div','res');
+  const R = 52, C = 2*Math.PI*R;
+  const ring = el('div','ring');
+  ring.innerHTML = '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="#dbe8e5" stroke-width="10"/><circle id="arc" cx="60" cy="60" r="'+R+'" fill="none" stroke="#2e9d5b" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+C+'"/></svg>';
+  const num = el('div','num','0/'+TOTAL); ring.appendChild(num);
+  res.appendChild(ring);
+  const n = s>=8?3:s>=5?2:s>=1?1:0;
+  const stars = el('div','stars'); stars.setAttribute('aria-label',n+' sao');
+  for(let i=0;i<3;i++){ const st=el('span',i<n?'':'off','★'); stars.appendChild(st); }
+  res.appendChild(stars);
+  res.appendChild(el('div','msg', s>=8?'Xuất sắc! Em đã nắm vững sự truyền nhiệt.':s>=5?'Khá tốt! Xem lại các câu sai để nhớ lâu hơn nhé.':'Cố lên! Hãy xem lại bài học rồi thử lại nhé.'));
+  const chips = el('div','chips');
+  TOPICS.forEach(t=>{
+    let ok=0,tot=0; QUIZ.forEach((q,i)=>{ if(q.topic===t){ tot++; if(answers[i]&&answers[i].correct) ok++; } });
+    chips.appendChild(el('span','',t+' '+ok+'/'+tot));
+  });
+  res.appendChild(chips);
+  const rev = el('div','rev'); rev.appendChild(el('h3','','XEM LẠI CÁC CÂU'));
+  QUIZ.forEach((q,i)=>{
+    const a = answers[i], good = a&&a.correct;
+    const item = el('div','ri');
+    const h = el('button','rh'); h.type='button'; h.setAttribute('aria-expanded','false');
+    h.append(el('span','rn','Câu '+(i+1)), el('span','rq',q.q), el('span','ric '+(good?'ok':'bad'), good?'✓':'✗'));
+    const b = el('div','rb');
+    const p1 = el('div'); const bb = el('b','','Đáp án đúng: '); p1.append(bb, document.createTextNode(q.a[q.ok]));
+    b.appendChild(p1);
+    if(a && !good) b.appendChild(el('div','','Em đã chọn: '+q.a[order[i][a.pos]]));
+    b.appendChild(el('div','',q.why));
+    h.addEventListener('click',()=>{ const o=item.classList.toggle('open'); h.setAttribute('aria-expanded',o); });
+    item.append(h,b); rev.appendChild(item);
+  });
+  res.appendChild(rev);
+  const again = el('button','again','↻ Làm lại'); again.type='button';
+  again.addEventListener('click',()=>{ reset(); render(); });
+  res.appendChild(again);
+  card.appendChild(res);
+  renderSegs(); updateArrows();
+  // animate
+  const arc = $('arc'), target = s/TOTAL;
+  if(reduce){ arc.style.strokeDashoffset = C*(1-target); num.textContent = s+'/'+TOTAL; }
+  else {
+    const t0 = performance.now(), dur = 1100;
+    const step = now => {
+      const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,3);
+      arc.style.strokeDashoffset = C*(1-target*e);
+      num.textContent = Math.round(s*e)+'/'+TOTAL;
+      if(k<1) countRaf = requestAnimationFrame(step);
+    };
+    countRaf = requestAnimationFrame(step);
+  }
+  if(!sent){
+    sent = true;
+    try{ window.parent.postMessage({type:'LESSON_MODULE_COMPLETE', module:'khtn8-b28-s38', score:s, total:TOTAL}, '*'); }catch(e){}
+  }
+}
+
+/* Events */
+prevBtn.addEventListener('click',goPrev);
+nxtBtn.addEventListener('click',goNext);
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const k = e.key;
+  if(k==='ArrowLeft'){ e.preventDefault(); goPrev(); return; }
+  if(showingResult) return;
+  if(k==='ArrowRight'){ e.preventDefault(); goNext(); return; }
+  if(k==='Enter'){
+    if(answers[cur]){ e.preventDefault(); goNext(); }
+    return;
+  }
+  let pos = -1;
+  if(/^[a-dA-D]$/.test(k)) pos = k.toUpperCase().charCodeAt(0)-65;
+  else if(/^[1-4]$/.test(k)) pos = +k-1;
+  if(pos>=0){ e.preventDefault(); choose(pos); }
+});
+
+const fsBtn = $('fs');
+fsBtn.addEventListener('click',()=>{
+  try{
+    const d=document, de=d.documentElement;
+    if(d.fullscreenElement||d.webkitFullscreenElement){ (d.exitFullscreen||d.webkitExitFullscreen).call(d); }
+    else (de.requestFullscreen||de.webkitRequestFullscreen).call(de);
+  }catch(err){}
+});
+let rt; const refit = ()=>{ clearTimeout(rt); rt=setTimeout(()=>{ if(!showingResult) fitQuestion(); },60); };
+window.addEventListener('resize',refit);
+document.addEventListener('fullscreenchange',refit);
+document.addEventListener('webkitfullscreenchange',refit);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+
+reset();
+(function(){
+  const n = parseInt(new URLSearchParams(location.search).get('q'),10);
+  if(n>=1 && n<=TOTAL) cur = n-1;
+})();
+render();
+</script>
+</body>
+</html>
